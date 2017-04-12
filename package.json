@@ -1,0 +1,23 @@
+{
+  "name": "home-pi",
+  "version": "0.0.0-development",
+  "description": "TFG",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SantiMA10/HomePi.git"
+  },
+  "author": "Santiago M.A. (@SantiMA10)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SantiMA10/HomePi/issues"
+  },
+  "homepage": "https://github.com/SantiMA10/HomePi#readme",
+  "devDependencies": {
+    "semantic-release": "^6.3.2"
+  }
+}
