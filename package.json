@@ -29,5 +29,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "firebase-admin": "^4.2.0"
   }
 }
