@@ -12,10 +12,6 @@ module.exports = {
             "error",
             "tab"
         ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
         "quotes": [
             "error",
             "double"
@@ -23,6 +19,10 @@ module.exports = {
         "semi": [
             "error",
             "always"
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
         ],
         "no-console": "off"
     }
