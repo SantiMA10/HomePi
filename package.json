@@ -1,11 +1,11 @@
 {
   "name": "home-pi",
   "version": "0.0.0-development",
-  "description": "TFG",
+  "description": "HomePi is my final degree project on University of Oviedo, my idea is build a easy to expand home automation system.",
   "main": "server.js",
   "scripts": {
     "test": "eslint . --ext .js",
-    "semantic-release": "semantic-release pre && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
