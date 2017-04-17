@@ -6,11 +6,10 @@ const firebase = require("firebase-admin");
 const requireDir = require("require-dir");
 const config = require(__dirname + "/config/config.json");
 
-
 const modules = {
-	"Actuator" : requireDir(__dirname + "/modules/actuator"),
-	"Sensor" : requireDir(__dirname + "/modules/sensor"),
-	"Service" : requireDir(__dirname + "/modules/service")
+	"Actuator" : requireDir(__dirname + "/modules/actuator", {recurse: true}),
+	"Sensor" : requireDir(__dirname + "/modules/sensor", {recurse: true}),
+	"Service" : requireDir(__dirname + "/modules/service", {recurse: true})
 };
 
 const serviceAccount = require(__dirname+config.firebase.configuration_file);
@@ -19,5 +18,6 @@ firebase.initializeApp({
 	credential: firebase.credential.cert(serviceAccount),
 	databaseURL: config.firebase.url
 });
+//firebase.database.enableLogging(true);
 
 console.log(modules);
