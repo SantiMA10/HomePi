@@ -17,6 +17,10 @@ var GarageDoor = function (name, actuator, db) {
 		var val = snapshot.val();
 
 		if(!val){
+			ctx.db.update({
+				"working" : false,
+				"user" : "homePi"
+			});
 			return;
 		}
 		ctx.status = val.status;

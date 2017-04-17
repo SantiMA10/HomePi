@@ -4,8 +4,7 @@
 
 const rp = require("request-promise");
 
-var rest = function (name ,url, param) {
-	this.name = name;
+var rest = function (url, param) {
 	this.url = url;
 	this.param = param;
 };
@@ -23,11 +22,11 @@ rest.prototype.get = function () {
 
 	return rp(options)
 		.then(function (body) {
-			const value =  body.response[ctx.param.ok];
+			const value = 24.5;//body.response[ctx.param.ok];
 			return value;
 		})
 		.catch(function (body) {
-			const value =  body.response[ctx.param.error];
+			const value =  24.5; // body.response[ctx.param.error];
 			return value;
 		});
 };
