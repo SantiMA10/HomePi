@@ -22,11 +22,11 @@ rest.prototype.get = function () {
 
 	return rp(options)
 		.then(function (body) {
-			const value = 24.5;//body.response[ctx.param.ok];
+			const value = body.response[ctx.param.ok];
 			return value;
 		})
 		.catch(function (body) {
-			const value =  24.5; // body.response[ctx.param.error];
+			const value = body.response[ctx.param.error];
 			return value;
 		});
 };
