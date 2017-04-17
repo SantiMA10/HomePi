@@ -4,11 +4,10 @@
 
 const rp = require("request-promise");
 
-var rest = function (name ,url, param, database) {
+var rest = function (name ,url, param) {
 	this.name = name;
 	this.url = url;
 	this.param = param;
-	this.database = database;
 };
 
 rest.prototype.get = function () {
@@ -21,20 +20,15 @@ rest.prototype.get = function () {
 		}
 	};
 
-	var ref = ctx.database.ref("sensor/" + ctx.name);
 
 	return rp(options)
 		.then(function (body) {
-			ref.update({
-				"status" : "ok",
-				"value" : body.response[ctx.param.ok]
-			});
+			const value =  body.response[ctx.param.ok];
+			return value;
 		})
 		.catch(function (body) {
-			ref.update({
-				"status" : "error",
-				"value" : body.response[ctx.param.error]
-			});
+			const value =  body.response[ctx.param.error];
+			return value;
 		});
 };
 
