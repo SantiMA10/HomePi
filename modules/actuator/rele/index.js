@@ -2,7 +2,7 @@
  * Created by Santiago M.A. on 17/04/2017.
  */
 
-const gpio = {};//require("rpi-gpio");
+const gpio = require("rpi-gpio");
 
 var rele = function (pin) {
 	this.pin = pin;
