@@ -2,13 +2,11 @@
  * Created by Santiago M.A. on 17/04/2017.
  */
 
-const gpio = require("rpi-gpio");
+const rpio = require("rpio");
 
 var rele = function (pin) {
 	this.pin = pin;
-	gpio.setup(pin, gpio.DIR_OUT, function () {
-		gpio.write(pin, true);
-	});
+	rpio.open(12, rpio.OUTPUT, rpio.LOW);
 };
 
 rele.prototype.blink = function () {
@@ -16,12 +14,12 @@ rele.prototype.blink = function () {
 	setTimeout(this.off, 2000);
 };
 
-rele.prototype.on = function (callback) {
-	gpio.write(this.pin, false, callback);
+rele.prototype.on = function () {
+	rpio.write(12, rpio.HIGH);
 };
 
-rele.prototype.off = function (callback) {
-	gpio.write(this.pin, true, callback);
+rele.prototype.off = function () {
+	rpio.write(12, rpio.LOW);
 };
 
 module.exports = rele;
