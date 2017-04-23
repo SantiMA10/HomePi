@@ -19,4 +19,4 @@ firebase.initializeApp({
 	databaseURL: config.firebase.url
 });
 //firebase.database.enableLogging(true);
-console.log(modules);
+new modules.Service.Sensor("Temperatura", modules.Service.Sensor.types.HUMEDITY, new modules.Sensor.Rest("http://10.0.0.138/", {"ok" : "temperature"}), firebase.database());
