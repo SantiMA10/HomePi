@@ -7,9 +7,9 @@ const requireDir = require("require-dir");
 const config = require(__dirname + "/config/config.json");
 
 const modules = {
-	"Actuator" : requireDir(__dirname + "/modules/actuator", {recurse: true}),
-	"Sensor" : requireDir(__dirname + "/modules/sensor", {recurse: true}),
-	"Service" : requireDir(__dirname + "/modules/service", {recurse: true})
+	"Actuator" : requireDir(__dirname + "/modules/actuator"),
+	"Sensor" : requireDir(__dirname + "/modules/sensor"),
+	"Service" : requireDir(__dirname + "/modules/service")
 };
 
 const serviceAccount = require(__dirname+config.firebase.configuration_file);
@@ -19,5 +19,4 @@ firebase.initializeApp({
 	databaseURL: config.firebase.url
 });
 //firebase.database.enableLogging(true);
-
 console.log(modules);

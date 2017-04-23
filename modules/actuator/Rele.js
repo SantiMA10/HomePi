@@ -2,7 +2,7 @@
  * Created by Santiago M.A. on 17/04/2017.
  */
 
-const rpio = require("rpio");
+const rpio = {};    //require("rpio");
 
 var rele = function (pin) {
 	this.pin = pin;

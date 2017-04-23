@@ -4,12 +4,12 @@
 
 const rp = require("request-promise");
 
-var rest = function (url, param) {
+var Rest = function (url, param) {
 	this.url = url;
 	this.param = param;
 };
 
-rest.prototype.get = function () {
+Rest.prototype.get = function () {
 
 	const ctx = this;
 	const options = {
@@ -22,13 +22,13 @@ rest.prototype.get = function () {
 
 	return rp(options)
 		.then(function (body) {
-			const value = body.response[ctx.param.ok];
+			const value = body[ctx.param.ok];
 			return value;
 		})
 		.catch(function (body) {
-			const value = body.response[ctx.param.error];
+			const value = body[ctx.param.error];
 			return value;
 		});
 };
 
-module.exports = rest;
+module.exports = Rest;
