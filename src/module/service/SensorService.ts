@@ -6,7 +6,7 @@ export enum SensorTypes{
     HUMEDITY
 }
 
-export class Sensor {
+export class SensorService {
 
     name : string;
     sensor : ReadData;
