@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@types/request-promise": "^4.1.33",
-    "firebase-admin": "^4.2.0",
+    "firebase-admin": "^5.0.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "require-dir": "^0.3.1"
