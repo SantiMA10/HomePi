@@ -8,7 +8,6 @@ class Rele implements SwitchButton{
         this.pin = pin;
     }
 
-
     blink(): void {
         throw new Error("Method not implemented.");
     }
