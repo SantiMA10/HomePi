@@ -1,23 +1,13 @@
 import { ReadData } from "../read"
 import * as requestPromise from "request-promise";
-import {RequestPromiseOptions} from "request-promise";
-import {UrlOptions} from "request";
-
-interface OptionsRestSensor{
-    ok : string,
-    error : string
-}
-
-interface Configuration extends UrlOptions, RequestPromiseOptions{
-
-}
+import {Configuration, RestOptions} from "../../util/RestUtil";
 
 export class RestSensor implements ReadData{
 
-    param : OptionsRestSensor;
+    param : RestOptions;
     options : Configuration;
 
-    constructor(url : string, param : OptionsRestSensor){
+    constructor(url : string, param : RestOptions){
         this.options = {
             "url" : url,
             "transform" :  (body) => {

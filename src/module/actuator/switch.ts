@@ -1,6 +1,6 @@
 export interface SwitchButton {
-    blink() : void;
-    on() : void;
-    off(): void;
+    blink() : any;
+    on() : any;
+    off(): any;
 }
 
