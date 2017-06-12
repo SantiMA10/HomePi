@@ -17,5 +17,5 @@ let hume = new RestSensor("http://10.0.0.138/", {
     "error": "error"
 });
 
-new SensorService("Temperatura", temp, SensorTypes.TEMPERATURE, admin.database());
-new SensorService("Humedad", hume, SensorTypes.HUMIDITY, admin.database());
+new SensorService("Temperatura", "Habitación Hijo", temp, SensorTypes.TEMPERATURE, admin.database());
+new SensorService("Humedad", "Habitación Hijo", hume, SensorTypes.HUMIDITY, admin.database());

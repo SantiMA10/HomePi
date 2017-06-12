@@ -9,12 +9,14 @@ export enum SensorTypes{
 export class SensorService {
 
     name : string;
+    place : string;
     sensor : ReadData;
     type : SensorTypes;
     ref : admin.database.Reference;
 
-    constructor(name:string, sensor : ReadData, type : SensorTypes, db: admin.database.Database){
+    constructor(name:string, place:string, sensor : ReadData, type : SensorTypes, db: admin.database.Database){
         this.name = name;
+        this.place = place;
         this.sensor = sensor;
         this.type = type;
         this.ref = db.ref("service/" + this.name);
@@ -26,14 +28,18 @@ export class SensorService {
                this.ref.update({
                    "working" : false,
                    "user": "homePi-server",
-                   "type" : this.type,
-                   "date" : new Date()
-               })
-           }
-
-           if(val.working && val.user !== "homePi-server"){
+                   "type" : this.enumToString(this.type),
+                   "date" : new Date(),
+                   "place" : this.place,
+               });
                this.readSensor();
            }
+           else{
+               if(val.working && val.user !== "homePi-server") {
+                   this.readSensor();
+               }
+           }
+
 
         });
     }
@@ -63,6 +69,15 @@ export class SensorService {
                 return error;
             });
 
+    }
+
+    public enumToString(sensorType : SensorTypes) : string{
+        switch (sensorType){
+            case SensorTypes.TEMPERATURE:
+                return "temperature";
+            case SensorTypes.HUMIDITY:
+                return "humidity";
+        }
     }
 
 }
