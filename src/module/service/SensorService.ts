@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 
 export enum SensorTypes{
     TEMPERATURE,
-    HUMEDITY
+    HUMIDITY
 }
 
 export class SensorService {
