@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import * as config from "../config/config.json";
 import {SensorService, SensorTypes} from "./module/service/SensorService";
-import {GarageService, GarageStatus, GarageStatus} from "./module/service/GarageService";
+import {GarageService, GarageStatus} from "./module/service/GarageService";
 import {RestSensor} from "./module/sensor/impl/RestSensor";
 import {RestSwitch} from "./module/actuator/impl/RestSwitch";
 
@@ -19,7 +19,7 @@ let hume = new RestSensor("http://10.0.0.138/", {
     "error": "error"
 });
 
-let rele = new RestSwitch("http://10.0.0.138/", {
+let rele = new RestSwitch("http://10.0.0.94/", {
     "on": "on",
     "off": "off"
 }, 3000);
