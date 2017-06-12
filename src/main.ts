@@ -8,9 +8,14 @@ admin.initializeApp({
     "databaseURL" : (<any>config).firebase.url
 });
 
-let rest = new RestSensor("http://10.0.0.138/", {
+let temp = new RestSensor("http://10.0.0.138/", {
     "ok": "temperature",
     "error": "error"
 });
+let hume = new RestSensor("http://10.0.0.138/", {
+    "ok": "humidity",
+    "error": "error"
+});
 
-new SensorService("Temperatura", rest, SensorTypes.TEMPERATURE, admin.database());
+new SensorService("Temperatura", "Mi habitación", temp, SensorTypes.TEMPERATURE, admin.database());
+new SensorService("Humedad", "Mi habitación", hume, SensorTypes.HUMIDITY, admin.database());
