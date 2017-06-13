@@ -16,5 +16,6 @@ gulp.task("cleanup", function() {
 });
 
 gulp.task("default", ["cleanup", "ts"], function () {
+	compileTS();
 	gulp.watch("src/**/*.ts", ["ts"]);
 });
