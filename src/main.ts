@@ -10,11 +10,11 @@ admin.initializeApp({
     "databaseURL" : (<any>config).firebase.url
 });
 
-let temp = new RestSensor("http://10.0.0.138/", {
+let temp = new RestSensor("http://10.0.0.139/", {
     "ok": "temperature",
     "error": "error"
 });
-let hume = new RestSensor("http://10.0.0.138/", {
+let hume = new RestSensor("http://10.0.0.139/", {
     "ok": "humidity",
     "error": "error"
 });

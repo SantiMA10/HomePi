@@ -15,13 +15,13 @@ export class RestSwitch implements SwitchButton{
 
     constructor(url : string, config : RestSwitchConfig, blinkTime : number){
         this.onOptions = {
-            "url" : [url, config.on].join("/"),
+            "url" : [url, config.on].join(""),
             "transform" :  (body) => {
                 return JSON.parse(body);
             }
         };
         this.offOptions = {
-            "url" : [url, config.off].join("/"),
+            "url" : [url, config.off].join(""),
             "transform" :  (body) => {
                 return JSON.parse(body);
             }
