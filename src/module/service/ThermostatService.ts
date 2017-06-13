@@ -1,81 +1,86 @@
 import { SwitchButton } from "../actuator/switch";
+import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
+import * as Promise from 'bluebird';
 
-export enum GarageStatus{
-    OPEN,
-    CLOSE,
-    OPENNING,
-    CLOSSING
-}
-
-export class GarageService {
+export class ThermostatService {
 
     name : string;
     place : string;
     switchButton : SwitchButton;
-    status : GarageStatus;
+    sensors : ReadData[];
+    status : number;
     ref : admin.database.Reference;
+    timeOut : any;
+    val : any;
+    refreshTime : number;
 
-    constructor(name : string, place : string, switchButton : SwitchButton, status : GarageStatus, db: admin.database.Database){
+    constructor(name : string, place : string, switchButton : SwitchButton, sensors : ReadData[], status : number, refreshTime : number, db: admin.database.Database){
         this.name = name;
         this.place = place;
         this.switchButton = switchButton;
+        this.sensors = sensors;
         this.status = status;
         this.ref = db.ref("service/" + this.name);
+        this.refreshTime = refreshTime;
+
+        let ctx = this;
 
         this.ref.on("value", (snap) => {
-            let val = snap.val();
+            ctx.val = snap.val();
 
-            if(!val){
+            if(!ctx.val){
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
-                    "type" : 0,
+                    "type" : 4,
                     "status" : this.status,
                     "date" : new Date(),
                     "place" : this.place,
                 });
             }
             else{
-                if(val.working && val.user !== "homePi-server"
-                        && val.status != GarageStatus.OPENNING && val.status != GarageStatus.CLOSSING) {
-                    this.work(val.status);
+                if(ctx.val.working && ctx.val.user !== "homePi-server" && !ctx.timeOut) {
+                    this.work(ctx.val.status, ctx.val.working);
+                }
+                else if(!ctx.val.working && ctx.val.user !== "homePi-server"){
+                    if(ctx.timeOut){
+                        clearTimeout(ctx.timeOut);
+                        ctx.timeOut = null;
+                    }
                 }
             }
 
         });
     }
 
-    public work(status : GarageStatus) : any {
+    public work(status : number, working : boolean) : any {
 
-        let target;
-        let step;
+        let promises = this.sensors.map((value) => { return value.get(); });
+        let current = -1;
 
-        if(status == GarageStatus.OPEN){
-            step = GarageStatus.CLOSSING;
-            target = GarageStatus.CLOSE;
-        }
-        else if(status == GarageStatus.CLOSE){
-            step = GarageStatus.OPENNING;
-            target = GarageStatus.OPEN;
-        }
+        let ctx = this;
 
-        this.switchButton.blink();
-
-        this.ref.update({
-            "date" : new Date,
-            "status" : step,
-        });
-
-        setTimeout(() => {
-            this.ref.update({
-                "date" : new Date,
-                "status" : target,
-                "working" : false,
-                "user": "homePi-server",
+        Promise.all(promises)
+            .then((temperatures) => {
+                current = temperatures.reduce((temp, total) => (total + temp)/2);
+                console.log(current);
+                if(working){
+                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.refreshTime * 60 * 1000);
+                }
+                if(current < status){
+                    ctx.switchButton.on();
+                    ctx.ref.update({
+                        "date" : new Date(),
+                    });
+                }
+                else{
+                    ctx.switchButton.off();
+                    ctx.ref.update({
+                        "date" : new Date(),
+                    });
+                }
             });
-        }, 20000)
-
 
     }
 
