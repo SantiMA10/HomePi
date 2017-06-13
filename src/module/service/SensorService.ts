@@ -71,12 +71,12 @@ export class SensorService {
 
     }
 
-    public enumToString(sensorType : SensorTypes) : string{
+    public enumToString(sensorType : SensorTypes) : number{
         switch (sensorType){
             case SensorTypes.TEMPERATURE:
-                return "temperature";
+                return 1;
             case SensorTypes.HUMIDITY:
-                return "humidity";
+                return 2;
         }
     }
 
