@@ -15,8 +15,6 @@ gulp.task("cleanup", function() {
 	return del([__dirname + "/app"]);
 });
 
-gulp.task("default", ["cleanup"], function () {
-	compileTS();
-
+gulp.task("default", ["cleanup", "ts"], function () {
 	gulp.watch("src/**/*.ts", ["ts"]);
 });
