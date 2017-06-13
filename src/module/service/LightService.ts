@@ -40,20 +40,23 @@ export class LightService {
 
     public work(status : boolean) : any {
 
-        if(status){
+        let query = {
+            "date" : new Date,
+            "status" : false,
+            "working" : false,
+            "user": "homePi-server",
+        };
+
+        if(JSON.parse(status+"")){
             this.switchButton.off();
+            query.status = false;
         }
         else{
             this.switchButton.on();
+            query.status = true;
         }
 
-        this.ref.update({
-            "date" : new Date,
-            "status" : !status,
-            "working" : false,
-            "user": "homePi-server",
-        });
-
+        this.ref.update(query);
     }
 
 
