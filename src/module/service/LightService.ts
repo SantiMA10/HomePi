@@ -23,7 +23,7 @@ export class LightService {
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
-                    "type" : "light",
+                    "type" : 3,
                     "status" : this.status,
                     "date" : new Date(),
                     "place" : this.place,

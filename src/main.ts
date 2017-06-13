@@ -3,6 +3,7 @@ import * as config from "../config/config.json";
 import {SensorService, SensorTypes} from "./module/service/SensorService";
 import {GarageService, GarageStatus} from "./module/service/GarageService";
 import {LightService} from "./module/service/LightService";
+import {ThermostatService} from "./module/service/ThermostatService";
 import {RestSensor} from "./module/sensor/impl/RestSensor";
 import {RestSwitch} from "./module/actuator/impl/RestSwitch";
 
@@ -29,3 +30,4 @@ new SensorService("Temperatura", "Mi habitación", temp, SensorTypes.TEMPERATURE
 new SensorService("Humedad", "Mi habitación", hume, SensorTypes.HUMIDITY, admin.database());
 new GarageService("Garaje", "Garaje", rele, GarageStatus.CLOSE, admin.database());
 new LightService("Luz techo", "Mi habitación", rele, false, admin.database());
+new ThermostatService("Termostato", "Salón", rele, [temp], 21, 1, admin.database());

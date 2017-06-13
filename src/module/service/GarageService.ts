@@ -30,7 +30,7 @@ export class GarageService {
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
-                    "type" : "garage",
+                    "type" : 0,
                     "status" : this.status,
                     "date" : new Date(),
                     "place" : this.place,

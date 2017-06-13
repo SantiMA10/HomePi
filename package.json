@@ -6,7 +6,7 @@
   "scripts": {
     "test": "eslint . --ext .js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "watch" : "nodemon app/main.js"
+    "watch": "nodemon app/main.js"
   },
   "repository": {
     "type": "git",
@@ -36,13 +36,11 @@
     }
   },
   "dependencies": {
+    "@types/bluebird": "^3.5.5",
     "@types/request-promise": "^4.1.33",
+    "bluebird": "^3.5.0",
     "firebase-admin": "^5.0.0",
     "request": "^2.81.0",
-    "request-promise": "^4.2.0",
-    "require-dir": "^0.3.1"
-  },
-  "optionalDependencies": {
-    "rpio": "^0.9.16"
+    "request-promise": "^4.2.0"
   }
 }
