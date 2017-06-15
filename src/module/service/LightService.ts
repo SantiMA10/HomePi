@@ -1,6 +1,7 @@
 import { SwitchButton } from "../actuator/switch";
 import * as admin from "firebase-admin";
 import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
+import {NotificationSender} from "../util/NotificationSender";
 
 export interface LightServiceConfig{
     name : string,
@@ -18,6 +19,7 @@ export class LightService {
     status : boolean;
     ref : admin.database.Reference;
     callback : any;
+    val : any;
 
     constructor(config : LightServiceConfig, db: admin.database.Database){
         this.name = config.name;
@@ -27,6 +29,7 @@ export class LightService {
         this.ref = db.ref("service/" + this.name);
         this.callback = (snap) => {
             let val = snap.val();
+            this.val = val;
 
             if(!val){
                 this.ref.update({
@@ -66,6 +69,15 @@ export class LightService {
             this.switchButton.on();
             query.status = true;
         }
+
+        if(this.val.config && this.val.config.notification){
+            new NotificationSender().sendNotification({
+                title : this.name + " - " + this.room,
+                icon : "",
+                body : "Ahora la luz esta " + (query.status ? "encendida" : "apagada") + "."
+            }, this.val.config.notification.filter((id) => this.val.user != id ));
+        }
+
 
         this.ref.update(query);
     }
