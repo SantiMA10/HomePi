@@ -1,6 +1,7 @@
 import { SwitchButton } from "../actuator/switch";
 import * as admin from "firebase-admin";
 import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
+import {NotificationSender} from "../util/NotificationSender";
 
 export enum GarageStatus{
     OPEN,
@@ -25,6 +26,7 @@ export class GarageService {
     status : GarageStatus;
     ref : admin.database.Reference;
     callback : any;
+    val : any;
 
     constructor(config : GarageServiceConfig, db: admin.database.Database){
         this.name = config.name;
@@ -34,6 +36,7 @@ export class GarageService {
         this.ref = db.ref("service/" + this.name);
         this.callback = (snap) => {
             let val = snap.val();
+            this.val = val;
 
             if(!val){
                 this.ref.update({
@@ -79,6 +82,14 @@ export class GarageService {
         });
 
         setTimeout(() => {
+            if(this.val.config && this.val.config.notification) {
+                new NotificationSender().sendNotification({
+                    title : this.name + " - " + this.room,
+                    icon : "",
+                    body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
+                }, this.val.config.notification.filter((id) => this.val.user != id));
+            }
+
             this.ref.update({
                 "date" : new Date,
                 "status" : target,

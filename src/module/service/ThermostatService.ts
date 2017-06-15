@@ -4,6 +4,7 @@ import * as admin from "firebase-admin";
 import * as Promise from 'bluebird';
 import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
 import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
+import {NotificationSender} from "../util/NotificationSender";
 
 export interface ThermostatServiceConfig{
     name : string,
@@ -38,7 +39,7 @@ export class ThermostatService {
             this.sensors.push(SensorFactory.build(config.sensorTypes[i], config.sensorConfigs[i]));
         }
         this.status = config.status;
-        this.refreshTime = config.refreshTime;
+        this.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
         this.ref = db.ref("service/" + this.name);
 
         let ctx = this;
@@ -64,6 +65,7 @@ export class ThermostatService {
                     if(ctx.timeOut){
                         clearTimeout(ctx.timeOut);
                         ctx.timeOut = null;
+                        this.switchButton.off();
                     }
                 }
             }
@@ -83,9 +85,8 @@ export class ThermostatService {
         Promise.all(promises)
             .then((temperatures) => {
                 current = temperatures.reduce((temp, total) => (total + temp)/2);
-                console.log(current);
                 if(working){
-                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.refreshTime * 60 * 1000);
+                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.refreshTime);
                 }
                 if(current < status){
                     ctx.switchButton.on();
@@ -94,6 +95,13 @@ export class ThermostatService {
                     });
                 }
                 else{
+                    if(this.val.config && this.val.config.notification) {
+                        new NotificationSender().sendNotification({
+                            title: this.name + " - " + this.room,
+                            icon: "",
+                            body: "Temperatura alcanzada. (" + current + "º)"
+                        }, this.val.config.notification);
+                    }
                     ctx.switchButton.off();
                     ctx.ref.update({
                         "date" : new Date(),
