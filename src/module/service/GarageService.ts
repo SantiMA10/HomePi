@@ -1,5 +1,6 @@
 import { SwitchButton } from "../actuator/switch";
 import * as admin from "firebase-admin";
+import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
 
 export enum GarageStatus{
     OPEN,
@@ -8,22 +9,30 @@ export enum GarageStatus{
     CLOSSING
 }
 
+export interface GarageServiceConfig{
+    name : string,
+    room : string,
+    actuatorType : ActuatorType,
+    actuatorConfig : any,
+    status : GarageStatus
+}
+
 export class GarageService {
 
     name : string;
-    place : string;
+    room : string;
     switchButton : SwitchButton;
     status : GarageStatus;
     ref : admin.database.Reference;
+    callback : any;
 
-    constructor(name : string, place : string, switchButton : SwitchButton, status : GarageStatus, db: admin.database.Database){
-        this.name = name;
-        this.place = place;
-        this.switchButton = switchButton;
-        this.status = status;
+    constructor(config : GarageServiceConfig, db: admin.database.Database){
+        this.name = config.name;
+        this.room = config.room;
+        this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
+        this.status = config.status;
         this.ref = db.ref("service/" + this.name);
-
-        this.ref.on("value", (snap) => {
+        this.callback = (snap) => {
             let val = snap.val();
 
             if(!val){
@@ -33,17 +42,19 @@ export class GarageService {
                     "type" : 0,
                     "status" : this.status,
                     "date" : new Date(),
-                    "place" : this.place,
+                    "room" : this.room,
                 });
             }
             else{
                 if(val.working && val.user !== "homePi-server"
-                        && val.status != GarageStatus.OPENNING && val.status != GarageStatus.CLOSSING) {
+                    && val.status != GarageStatus.OPENNING && val.status != GarageStatus.CLOSSING) {
                     this.work(val.status);
                 }
             }
 
-        });
+        };
+
+        this.ref.on("value", this.callback);
     }
 
     public work(status : GarageStatus) : any {
@@ -77,6 +88,10 @@ export class GarageService {
         }, 20000)
 
 
+    }
+
+    public detroy(){
+        this.ref.off('value', this.callback);
     }
 
 

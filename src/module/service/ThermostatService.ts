@@ -2,11 +2,24 @@ import { SwitchButton } from "../actuator/switch";
 import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
 import * as Promise from 'bluebird';
+import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
+import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
+
+export interface ThermostatServiceConfig{
+    name : string,
+    room : string,
+    actuatorType : ActuatorType,
+    actuatorConfig : any,
+    status : number,
+    refreshTime : number,
+    sensorTypes : SensorTypes[],
+    sensorConfigs : any[]
+}
 
 export class ThermostatService {
 
     name : string;
-    place : string;
+    room : string;
     switchButton : SwitchButton;
     sensors : ReadData[];
     status : number;
@@ -14,19 +27,23 @@ export class ThermostatService {
     timeOut : any;
     val : any;
     refreshTime : number;
+    callback : any;
 
-    constructor(name : string, place : string, switchButton : SwitchButton, sensors : ReadData[], status : number, refreshTime : number, db: admin.database.Database){
-        this.name = name;
-        this.place = place;
-        this.switchButton = switchButton;
-        this.sensors = sensors;
-        this.status = status;
+    constructor(config : ThermostatServiceConfig, db: admin.database.Database){
+        this.name = config.name;
+        this.room = config.room;
+        this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
+        this.sensors = [];
+        for(let i = 0; i < config.sensorTypes.length; i++){
+            this.sensors.push(SensorFactory.build(config.sensorTypes[i], config.sensorConfigs[i]));
+        }
+        this.status = config.status;
+        this.refreshTime = config.refreshTime;
         this.ref = db.ref("service/" + this.name);
-        this.refreshTime = refreshTime;
 
         let ctx = this;
 
-        this.ref.on("value", (snap) => {
+        this.callback = (snap) => {
             ctx.val = snap.val();
 
             if(!ctx.val){
@@ -36,7 +53,7 @@ export class ThermostatService {
                     "type" : 4,
                     "status" : this.status,
                     "date" : new Date(),
-                    "place" : this.place,
+                    "room" : this.room,
                 });
             }
             else{
@@ -51,7 +68,9 @@ export class ThermostatService {
                 }
             }
 
-        });
+        };
+
+        this.ref.on("value", this.callback);
     }
 
     public work(status : number, working : boolean) : any {
@@ -82,6 +101,10 @@ export class ThermostatService {
                 }
             });
 
+    }
+
+    public detroy(){
+        this.ref.off('value', this.callback);
     }
 
 

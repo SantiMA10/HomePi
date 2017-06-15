@@ -3,8 +3,12 @@ import * as requestPromise from "request-promise";
 import {Configuration} from "../../util/RestUtil";
 
 interface RestSwitchConfig {
-    on : string,
-    off : string
+    url : string,
+    blinkTime : number,
+    paths : {
+        on : string,
+        off : string
+    }
 }
 
 export class RestSwitch implements SwitchButton{
@@ -13,20 +17,20 @@ export class RestSwitch implements SwitchButton{
     onOptions : Configuration;
     blinkTime : number;
 
-    constructor(url : string, config : RestSwitchConfig, blinkTime : number){
+    constructor(config : RestSwitchConfig){
         this.onOptions = {
-            "url" : [url, config.on].join(""),
+            "url" : [config.url, config.paths.on].join(""),
             "transform" :  (body) => {
                 return JSON.parse(body);
             }
         };
         this.offOptions = {
-            "url" : [url, config.off].join(""),
+            "url" : [config.url, config.paths.off].join(""),
             "transform" :  (body) => {
                 return JSON.parse(body);
             }
         };
-        this.blinkTime = blinkTime;
+        this.blinkTime = config.blinkTime;
     }
 
     blink(): any {
