@@ -1,47 +1,57 @@
 import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
+import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
 
-export enum SensorTypes{
+export interface SensorServiceType{
     TEMPERATURE,
-    HUMIDITY
+    HUMIDITY,
+}
+
+export interface SensorServiceConfig{
+    name : string,
+    room : string,
+    sensorType : SensorTypes,
+    sensorConfig : any,
+    sensorServiceType : SensorServiceType
 }
 
 export class SensorService {
 
     name : string;
-    place : string;
+    room : string;
     sensor : ReadData;
-    type : SensorTypes;
+    type : SensorServiceType;
     ref : admin.database.Reference;
+    callback : any;
 
-    constructor(name:string, place:string, sensor : ReadData, type : SensorTypes, db: admin.database.Database){
-        this.name = name;
-        this.place = place;
-        this.sensor = sensor;
-        this.type = type;
+    constructor(config : SensorServiceConfig, db: admin.database.Database){
+        this.name = config.name;
+        this.room = config.room;
+        this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
+        this.type = config.sensorServiceType;
         this.ref = db.ref("service/" + this.name);
 
-        this.ref.on("value", (snap) => {
-           let val = snap.val();
+        this.callback = (snap) => {
+            let val = snap.val();
 
-           if(!val){
-               this.ref.update({
-                   "working" : false,
-                   "user": "homePi-server",
-                   "type" : this.enumToString(this.type),
-                   "date" : new Date(),
-                   "place" : this.place,
-               });
-               this.readSensor();
-           }
-           else{
-               if(val.working && val.user !== "homePi-server") {
-                   this.readSensor();
-               }
-           }
+            if(!val){
+                this.ref.update({
+                    "working" : false,
+                    "user": "homePi-server",
+                    "type" : this.type,
+                    "date" : new Date(),
+                    "room" : this.room,
+                });
+                this.readSensor();
+            }
+            else{
+                if(val.working && val.user !== "homePi-server") {
+                    this.readSensor();
+                }
+            }
+        };
 
-
-        });
+        this.ref.on("value", this.callback);
     }
 
     public readSensor() : any {
@@ -71,13 +81,8 @@ export class SensorService {
 
     }
 
-    public enumToString(sensorType : SensorTypes) : number{
-        switch (sensorType){
-            case SensorTypes.TEMPERATURE:
-                return 1;
-            case SensorTypes.HUMIDITY:
-                return 2;
-        }
+    public detroy(){
+       this.ref.off('value', this.callback);
     }
 
 }
