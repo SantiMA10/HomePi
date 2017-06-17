@@ -20,43 +20,46 @@ export interface ThermostatServiceConfig{
 
 export class ThermostatService {
 
-    name : string;
-    room : string;
+    config : ThermostatServiceConfig;
     switchButton : SwitchButton;
     sensors : ReadData[];
-    status : number;
     ref : admin.database.Reference;
     timeOut : any;
     val : any;
-    refreshTime : number;
     callback : any;
 
-    constructor(config : ThermostatServiceConfig, db: admin.database.Database){
-        this.name = config.name;
-        this.room = config.room;
+    constructor(config : ThermostatServiceConfig, db: admin.database.Database, key : string){
+        this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
         this.sensors = [];
         for(let i = 0; i < config.sensorTypes.length; i++){
             this.sensors.push(SensorFactory.build(config.sensorTypes[i], config.sensorConfigs[i]));
         }
-        this.status = config.status;
-        this.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
-        this.ref = db.ref("service/" + this.name);
+        config.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
+        this.ref = db.ref("service/" +  key);
 
         let ctx = this;
+
+        this.ref.update({
+            "name" : this.config.name,
+            "status" : this.config.status,
+            "date" : new Date(),
+            "room" : this.config.room,
+            "key" : this.config.key
+        });
 
         this.callback = (snap) => {
             ctx.val = snap.val();
 
-            if(!ctx.val){
+            if(!ctx.val.user){
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
                     "type" : 4,
-                    "status" : this.status,
+                    "status" : this.config.status,
                     "date" : new Date(),
-                    "room" : this.room,
-                    "key" : config.key
+                    "room" : this.config.room,
+                    "key" : this.config.key
                 });
             }
             else{
@@ -88,7 +91,7 @@ export class ThermostatService {
             .then((temperatures) => {
                 current = temperatures.reduce((temp, total) => (total + temp)/2);
                 if(working){
-                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.refreshTime);
+                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.config.refreshTime);
                 }
                 if(current < status){
                     ctx.switchButton.on();
@@ -99,7 +102,7 @@ export class ThermostatService {
                 else{
                     if(this.val.config && this.val.config.notification) {
                         new NotificationSender().sendNotification({
-                            title: this.name + " - " + this.room,
+                            title: this.config.name + " - " + this.config.room,
                             icon: "",
                             body: "Temperatura alcanzada. (" + current + "º)"
                         }, this.val.config.notification);
@@ -113,7 +116,7 @@ export class ThermostatService {
 
     }
 
-    public detroy(){
+    public destroy(){
         this.ref.off('value', this.callback);
     }
 

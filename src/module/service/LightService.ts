@@ -14,33 +14,38 @@ export interface LightServiceConfig{
 
 export class LightService {
 
-    name : string;
-    room : string;
+    config : LightServiceConfig;
     switchButton : SwitchButton;
-    status : boolean;
     ref : admin.database.Reference;
     callback : any;
     val : any;
 
-    constructor(config : LightServiceConfig, db: admin.database.Database){
-        this.name = config.name;
-        this.room = config.room;
+    constructor(config : LightServiceConfig, db: admin.database.Database, key : string){
+        this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
-        this.status = config.status;
-        this.ref = db.ref("service/" + this.name);
+        this.ref = db.ref("service/" + key);
+
+        this.ref.update({
+            "name" : this.config.name,
+            "key" : this.config.key,
+            "status" : this.config.status,
+            "date" : new Date(),
+            "room" : this.config.room,
+        });
+
         this.callback = (snap) => {
             let val = snap.val();
             this.val = val;
 
-            if(!val){
+            if(!val.user){
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
                     "type" : 3,
-                    "key" : config.key,
-                    "status" : this.status,
+                    "key" : this.config.key,
+                    "status" : this.config.status,
                     "date" : new Date(),
-                    "room" : this.room,
+                    "room" : this.config.room,
                 });
             }
             else{
@@ -74,7 +79,7 @@ export class LightService {
 
         if(this.val.config && this.val.config.notification){
             new NotificationSender().sendNotification({
-                title : this.name + " - " + this.room,
+                title : this.config.name + " - " + this.config.room,
                 icon : "",
                 body : "Ahora la luz esta " + (query.status ? "encendida" : "apagada") + "."
             }, this.val.config.notification.filter((id) => this.val.user != id ));
@@ -84,7 +89,7 @@ export class LightService {
         this.ref.update(query);
     }
 
-    public detroy(){
+    public destroy(){
         this.ref.off('value', this.callback);
     }
 

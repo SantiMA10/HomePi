@@ -21,33 +21,40 @@ export interface GarageServiceConfig{
 
 export class GarageService {
 
-    name : string;
-    room : string;
+    config : GarageServiceConfig;
     switchButton : SwitchButton;
-    status : GarageStatus;
     ref : admin.database.Reference;
     callback : any;
     val : any;
 
-    constructor(config : GarageServiceConfig, db: admin.database.Database){
-        this.name = config.name;
-        this.room = config.room;
+    constructor(config : GarageServiceConfig, db: admin.database.Database, key : string){
+
+        this.config = config;
+
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
-        this.status = config.status;
-        this.ref = db.ref("service/" + this.name);
+        this.ref = db.ref("service/" + key);
+
+        this.ref.update({
+            "name" : this.config.name,
+            "key" : this.config.key,
+            "status" : this.config.status,
+            "date" : new Date(),
+            "room" : this.config.room,
+        });
+
         this.callback = (snap) => {
             let val = snap.val();
             this.val = val;
 
-            if(!val){
+            if(!val.user){
                 this.ref.update({
                     "working" : false,
-                    "key" : config.key,
+                    "key" : this.config.key,
                     "user": "homePi-server",
                     "type" : 0,
-                    "status" : this.status,
+                    "status" : this.config.status,
                     "date" : new Date(),
-                    "room" : this.room,
+                    "room" : this.config.room,
                 });
             }
             else{
@@ -86,7 +93,7 @@ export class GarageService {
         setTimeout(() => {
             if(this.val.config && this.val.config.notification) {
                 new NotificationSender().sendNotification({
-                    title : this.name + " - " + this.room,
+                    title : this.config.name + " - " + this.config.room,
                     icon : "",
                     body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
                 }, this.val.config.notification.filter((id) => this.val.user != id));
@@ -103,7 +110,7 @@ export class GarageService {
 
     }
 
-    public detroy(){
+    public destroy(){
         this.ref.off('value', this.callback);
     }
 

@@ -12,7 +12,9 @@ let createdServices = [];
 admin.database().ref("/services").on('value', (snap) => {
 
     createdServices.forEach((service) => {
-        service.destroy();
+        if(service != null){
+            service.destroy();
+        }
     });
 
     createdServices = [];
@@ -20,6 +22,6 @@ admin.database().ref("/services").on('value', (snap) => {
     Object.keys(services).forEach((key) => {
         let service = services[key];
         service.config["key"] = key;
-        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database()));
+        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database(), key));
     });
 });
