@@ -15,7 +15,8 @@ export interface GarageServiceConfig{
     room : string,
     actuatorType : ActuatorType,
     actuatorConfig : any,
-    status : GarageStatus
+    status : GarageStatus,
+    key : string
 }
 
 export class GarageService {
@@ -41,6 +42,7 @@ export class GarageService {
             if(!val){
                 this.ref.update({
                     "working" : false,
+                    "key" : config.key,
                     "user": "homePi-server",
                     "type" : 0,
                     "status" : this.status,

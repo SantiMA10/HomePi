@@ -12,7 +12,8 @@ export interface SensorServiceConfig{
     room : string,
     sensorType : SensorTypes,
     sensorConfig : any,
-    sensorServiceType : SensorServiceType
+    sensorServiceType : SensorServiceType,
+    key : string
 }
 
 export class SensorService {
@@ -41,6 +42,7 @@ export class SensorService {
                     "type" : this.type,
                     "date" : new Date(),
                     "room" : this.room,
+                    "key" : config.key
                 });
                 this.readSensor();
             }

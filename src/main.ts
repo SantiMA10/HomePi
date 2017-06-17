@@ -20,7 +20,7 @@ admin.database().ref("/services").on('value', (snap) => {
     let services = snap.val();
     Object.keys(services).forEach((key) => {
         let service = services[key];
-
+        service.config["key"] = key;
         createdServices.push(ServiceFactory.build(service.type, service.config, admin.database()));
     });
 });

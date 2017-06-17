@@ -14,7 +14,8 @@ export interface ThermostatServiceConfig{
     status : number,
     refreshTime : number,
     sensorTypes : SensorTypes[],
-    sensorConfigs : any[]
+    sensorConfigs : any[],
+    key : string
 }
 
 export class ThermostatService {
@@ -55,6 +56,7 @@ export class ThermostatService {
                     "status" : this.status,
                     "date" : new Date(),
                     "room" : this.room,
+                    "key" : config.key
                 });
             }
             else{

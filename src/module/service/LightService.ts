@@ -8,7 +8,8 @@ export interface LightServiceConfig{
     room : string,
     actuatorType : ActuatorType,
     actuatorConfig : any,
-    status : boolean
+    status : boolean,
+    key : string
 }
 
 export class LightService {
@@ -36,6 +37,7 @@ export class LightService {
                     "working" : false,
                     "user": "homePi-server",
                     "type" : 3,
+                    "key" : config.key,
                     "status" : this.status,
                     "date" : new Date(),
                     "room" : this.room,
