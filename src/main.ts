@@ -12,8 +12,7 @@ let createdServices = [];
 admin.database().ref("/services").on('value', (snap) => {
 
     createdServices.forEach((service) => {
-        console.log(service);
-       service.destroy();
+        service.destroy();
     });
 
     createdServices = [];

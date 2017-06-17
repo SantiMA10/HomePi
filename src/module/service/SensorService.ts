@@ -83,7 +83,7 @@ export class SensorService {
 
     }
 
-    public detroy(){
+    public destroy(){
        this.ref.off('value', this.callback);
     }
 
