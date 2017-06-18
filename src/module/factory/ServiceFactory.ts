@@ -18,7 +18,7 @@ export class ServiceFactory{
 
         switch (serviceType){
             case ServiceType.GARAGE:
-                return new GarageService(config, db, key);
+                return new GarageService(config, db);
             case ServiceType.TEMPERATURE:
                 return new SensorService(config, db, key);
             case ServiceType.HUMIDITY:
