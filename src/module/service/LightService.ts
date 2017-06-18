@@ -12,81 +12,75 @@ export interface LightServiceConfig{
     key : string
 }
 
+interface LightServiceInstance{
+    working : boolean,
+    user : string,
+    status : boolean,
+    config : any
+}
+
 export class LightService {
 
     config : LightServiceConfig;
     switchButton : SwitchButton;
     ref : admin.database.Reference;
     callback : any;
-    val : any;
 
-    constructor(config : LightServiceConfig, db: admin.database.Database, key : string){
+    constructor(config : LightServiceConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
-        this.ref = db.ref("service/" + key);
 
-        this.ref.update({
-            "name" : this.config.name,
-            "key" : this.config.key,
-            "status" : this.config.status,
-            "date" : new Date(),
-            "room" : this.config.room,
-        });
+        if(db != null){
+            this.ref = db.ref("service/" + this.config.key);
+            this.ref.update({
+                "name" : this.config.name,
+                "key" : this.config.key,
+                "status" : this.config.status,
+                "date" : new Date(),
+                "room" : this.config.room,
+            });
+            this.ref.on("value", this.callback);
+        }
 
         this.callback = (snap) => {
-            let val = snap.val();
-            this.val = val;
-
-            if(!val.user){
-                this.ref.update({
-                    "working" : false,
-                    "user": "homePi-server",
-                    "type" : 3,
-                    "key" : this.config.key,
-                    "status" : this.config.status,
-                    "date" : new Date(),
-                    "room" : this.config.room,
-                });
+            let instance = snap.val();
+            if(this.hasToWork(instance)){
+                this.ref.update(this.work(instance));
             }
-            else{
-                if(val.working && val.user !== "homePi-server") {
-                    this.work(val.status);
-                }
-            }
-
         };
 
-        this.ref.on("value", this.callback);
     }
 
-    public work(status : boolean) : any {
+    public hasToWork(instance : LightServiceInstance){
+        return instance.working && instance.user !== process.env.SERVER_USER;
+    }
 
-        let query = {
-            "date" : new Date,
-            "status" : false,
-            "working" : false,
-            "user": "homePi-server",
-        };
+    public work(instance : LightServiceInstance) : any {
 
-        if(JSON.parse(status+"")){
+        if(JSON.parse(instance.status+"")){
             this.switchButton.off();
-            query.status = false;
+            instance.status = false;
         }
         else{
             this.switchButton.on();
-            query.status = true;
+            instance.status = true;
         }
 
-        if(this.val.config && this.val.config.notification){
+        if(instance.config && instance.config.notification){
             new NotificationSender().sendNotification({
                 title : this.config.name + " - " + this.config.room,
                 icon : "",
-                body : "Ahora la luz esta " + (query.status ? "encendida" : "apagada") + "."
-            }, this.val.config.notification.filter((id) => this.val.user != id ));
+                body : "Ahora la luz esta " + (instance.status ? "encendida" : "apagada") + "."
+            }, instance.config.notification.filter((id) => instance.user != id ));
         }
 
 
-        this.ref.update(query);
+        return {
+            "date" : new Date(),
+            "status" : instance.status,
+            "working" : false,
+            "user" : process.env.SERVER_USER
+        };
     }
 
     public destroy(){

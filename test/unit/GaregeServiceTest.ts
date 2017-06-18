@@ -97,6 +97,45 @@ describe('GarageService', () => {
 
     });
 
+    describe('work', () => {
+
+        let garageService = new GarageService({
+            "name" : "Garaje",
+            "room" : "Garaje",
+            "status" : 1,
+            "actuatorConfig" : {
+                "blinkTime" : 1000,
+                "paths" : {
+                    "on" : "on",
+                    "off" : "off"
+                },
+                "url" : "http://10.0.0.139"
+            },
+            "actuatorType" : 0,
+            "key" : "test"
+        }, null);
+
+        it('working:true, user:pepe, status:OPEN', () => {
+            garageService.work({"working" : true, "user" : "pepe", "status" : GarageStatus.OPEN, "config" : ""}).then((instance) => {
+                expect(instance).to.deep.include({"update" : { "status" : GarageStatus.CLOSSING}});
+                instance.promise.then((instance) => {
+                    expect(instance).to.deep.include({ "status" : GarageStatus.CLOSE});
+                });
+            });
+        });
+
+        it('working:true, user:pepe, status:OPEN', () => {
+            garageService.work({"working" : true, "user" : "pepe", "status" : GarageStatus.CLOSE, "config" : ""}).then((instance) => {
+                expect(instance).to.deep.include({"update" : { "status" : GarageStatus.OPENNING}});
+                instance.promise.then((instance) => {
+                    expect(instance).to.deep.include({ "status" : GarageStatus.OPEN});
+                });
+            });
+        });
+
+
+    });
+
 });
 
 after((done) => {

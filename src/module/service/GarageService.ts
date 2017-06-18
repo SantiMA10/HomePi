@@ -110,7 +110,7 @@ export class GarageService {
                             "date" : new Date,
                             "status" : target,
                             "working" : false,
-                            "user": "homePi-server",
+                            "user": process.env.SERVER_USER,
                         });
 
                     }, 20000);
