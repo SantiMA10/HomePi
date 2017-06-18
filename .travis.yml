@@ -14,9 +14,3 @@ after_success:
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
-install:
-  - npm install -g codecov
-  - npm install -g istanbul
-script:
-  -  ./node_modules/mocha/bin/_mocha "test/**/*.ts" --require ./node_modules/ts-node/register --ui bdd --reporter lcovonly -- -R spec
-  - codecov
