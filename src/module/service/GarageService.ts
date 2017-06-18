@@ -2,6 +2,7 @@ import { SwitchButton } from "../actuator/switch";
 import * as admin from "firebase-admin";
 import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
 import {NotificationSender} from "../util/NotificationSender";
+import * as Bluebird from 'bluebird';
 
 export enum GarageStatus{
     OPEN,
@@ -10,98 +11,118 @@ export enum GarageStatus{
     CLOSSING
 }
 
-export interface GarageServiceConfig{
+export interface GarageServiceConfig {
     name : string,
     room : string,
     actuatorType : ActuatorType,
     actuatorConfig : any,
-    status : GarageStatus
+    status : GarageStatus,
+    key : string
+}
+
+interface GarageServiceInstance{
+    working : boolean,
+    user : string,
+    status : GarageStatus,
+    config : any
 }
 
 export class GarageService {
 
-    name : string;
-    room : string;
+    config : GarageServiceConfig;
     switchButton : SwitchButton;
-    status : GarageStatus;
     ref : admin.database.Reference;
     callback : any;
-    val : any;
 
     constructor(config : GarageServiceConfig, db: admin.database.Database){
-        this.name = config.name;
-        this.room = config.room;
+
+        this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
-        this.status = config.status;
-        this.ref = db.ref("service/" + this.name);
         this.callback = (snap) => {
-            let val = snap.val();
-            this.val = val;
-
-            if(!val){
-                this.ref.update({
-                    "working" : false,
-                    "user": "homePi-server",
-                    "type" : 0,
-                    "status" : this.status,
-                    "date" : new Date(),
-                    "room" : this.room,
-                });
+            let instance = snap.val();
+            if(this.hasToWork(instance)){
+                this.work(instance)
+                    .then((instance) => {
+                        this.ref.update(instance.update);
+                        instance.promise.then((instance) => {
+                            this.ref.update(instance);
+                        })
+                    });
             }
-            else{
-                if(val.working && val.user !== "homePi-server"
-                    && val.status != GarageStatus.OPENNING && val.status != GarageStatus.CLOSSING) {
-                    this.work(val.status);
-                }
-            }
-
         };
 
-        this.ref.on("value", this.callback);
+        if(db){
+            this.ref = db.ref("service/" + this.config.key);
+
+            this.ref.update({
+                "name" : this.config.name,
+                "key" : this.config.key,
+                "status" : this.config.status,
+                "date" : new Date(),
+                "room" : this.config.room,
+            });
+            this.ref.on("value", this.callback);
+        }
+
+
     }
 
-    public work(status : GarageStatus) : any {
+    public hasToWork(instance : GarageServiceInstance){
+        return instance.working && instance.user != process.env.SERVER_USER && instance.status != GarageStatus.CLOSSING
+            && instance.status != GarageStatus.OPENNING;
+    }
+
+    public work(instance : GarageServiceInstance) : Bluebird<any> {
 
         let target;
         let step;
 
-        if(status == GarageStatus.OPEN){
+        if(instance.status == GarageStatus.OPEN){
             step = GarageStatus.CLOSSING;
             target = GarageStatus.CLOSE;
         }
-        else if(status == GarageStatus.CLOSE){
+        else if(instance.status == GarageStatus.CLOSE){
             step = GarageStatus.OPENNING;
             target = GarageStatus.OPEN;
         }
 
         this.switchButton.blink();
 
-        this.ref.update({
-            "date" : new Date,
-            "status" : step,
-        });
+        return new Bluebird((resolve) => {
 
-        setTimeout(() => {
-            if(this.val.config && this.val.config.notification) {
-                new NotificationSender().sendNotification({
-                    title : this.name + " - " + this.room,
-                    icon : "",
-                    body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
-                }, this.val.config.notification.filter((id) => this.val.user != id));
-            }
+            return resolve({
+                "update" : {
+                    "date" : new Date,
+                    "status" : step,
+                },
+                "promise" : new Bluebird((resolve) => {
 
-            this.ref.update({
-                "date" : new Date,
-                "status" : target,
-                "working" : false,
-                "user": "homePi-server",
+                    setTimeout(() => {
+                        if(instance.config && instance.config.notification) {
+                            new NotificationSender().sendNotification({
+                                title : this.config.name + " - " + this.config.room,
+                                icon : "",
+                                body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
+                            }, instance.config.notification.filter((id) => instance.user != id));
+                        }
+
+                        resolve({
+                            "date" : new Date,
+                            "status" : target,
+                            "working" : false,
+                            "user": "homePi-server",
+                        });
+
+                    }, 20000);
+
+                })
             });
-        }, 20000)
 
+        });
 
     }
 
-    public detroy(){
+    public destroy(){
         this.ref.off('value', this.callback);
     }
 

@@ -12,35 +12,41 @@ export interface SensorServiceConfig{
     room : string,
     sensorType : SensorTypes,
     sensorConfig : any,
-    sensorServiceType : SensorServiceType
+    sensorServiceType : SensorServiceType,
+    key : string
 }
 
 export class SensorService {
 
-    name : string;
-    room : string;
+    config : SensorServiceConfig;
     sensor : ReadData;
-    type : SensorServiceType;
     ref : admin.database.Reference;
     callback : any;
 
-    constructor(config : SensorServiceConfig, db: admin.database.Database){
-        this.name = config.name;
-        this.room = config.room;
+    constructor(config : SensorServiceConfig, db: admin.database.Database, key : string){
+        this.config = config;
         this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
-        this.type = config.sensorServiceType;
-        this.ref = db.ref("service/" + this.name);
+        this.ref = db.ref("service/" + key);
+
+        this.ref.update({
+            "name" : this.config.name,
+            "type" : this.config.sensorServiceType,
+            "date" : new Date(),
+            "room" : this.config.room,
+            "key" : this.config.key
+        });
 
         this.callback = (snap) => {
             let val = snap.val();
 
-            if(!val){
+            if(!val.user){
                 this.ref.update({
                     "working" : false,
                     "user": "homePi-server",
-                    "type" : this.type,
+                    "type" : this.config.sensorServiceType,
                     "date" : new Date(),
-                    "room" : this.room,
+                    "room" : this.config.room,
+                    "key" : this.config.key
                 });
                 this.readSensor();
             }
@@ -81,7 +87,7 @@ export class SensorService {
 
     }
 
-    public detroy(){
+    public destroy(){
        this.ref.off('value', this.callback);
     }
 

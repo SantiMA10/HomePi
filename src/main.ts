@@ -1,10 +1,12 @@
 import * as admin from "firebase-admin";
-import * as config from "../config/config.json";
 import {ServiceFactory} from "./module/factory/ServiceFactory";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 admin.initializeApp({
-    "credential" : admin.credential.cert(__dirname + "/.." + (<any>config).firebase.configuration_file),
-    "databaseURL" : (<any>config).firebase.url
+    "credential" : admin.credential.cert(__dirname + "/.." + process.env.CONFIGURATION_FILE),
+    "databaseURL" : process.env.DATABASE_URL
 });
 
 let createdServices = [];
@@ -12,15 +14,17 @@ let createdServices = [];
 admin.database().ref("/services").on('value', (snap) => {
 
     createdServices.forEach((service) => {
-        console.log(service);
-       service.destroy();
+        if(service != null){
+            service.destroy();
+        }
     });
 
     createdServices = [];
     let services = snap.val();
     Object.keys(services).forEach((key) => {
         let service = services[key];
-
-        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database()));
+        service.config["key"] = key;
+        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database(), key));
     });
+
 });
