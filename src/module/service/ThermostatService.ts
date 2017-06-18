@@ -13,9 +13,13 @@ export interface ThermostatServiceConfig{
     actuatorConfig : any,
     status : number,
     refreshTime : number,
-    sensorTypes : SensorTypes[],
-    sensorConfigs : any[],
+    sensors : SensorConfig[],
     key : string
+}
+
+interface SensorConfig{
+    sensorType : SensorTypes,
+    sensorConfig : any
 }
 
 export class ThermostatService {
@@ -32,9 +36,10 @@ export class ThermostatService {
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
         this.sensors = [];
-        for(let i = 0; i < config.sensorTypes.length; i++){
-            this.sensors.push(SensorFactory.build(config.sensorTypes[i], config.sensorConfigs[i]));
-        }
+        config.sensors.forEach((sensor) => {
+            this.sensors.push(SensorFactory.build(sensor.sensorType, sensor.sensorConfig));
+        });
+
         config.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
         this.ref = db.ref("service/" +  key);
 
