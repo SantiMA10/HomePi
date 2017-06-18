@@ -4,7 +4,8 @@
   "description": "HomePi is my final degree project on University of Oviedo, my idea is build a easy to expand home automation system.",
   "main": "server.js",
   "scripts": {
-    "test": "mocha \"test/**/*.ts\" --require ts-node/register --ui bdd",
+    "test": "nyc mocha \"test/**/*.ts\" --require ts-node/register --ui bdd",
+    "posttest": "nyc report --reporter=json && codecov -f coverage/*.json",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "watch": "nodemon app/main.js"
   },
@@ -23,14 +24,18 @@
     "@types/mocha": "^2.2.41",
     "@types/sinon": "^2.3.1",
     "chai": "^4.0.2",
+    "codecov": "^2.2.0",
     "cz-conventional-changelog": "^2.0.0",
     "del": "^2.2.2",
     "firebase-server": "^0.10.1",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.1.7",
+    "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
     "semantic-release": "^6.3.2",
     "sinon": "^2.3.4",
+    "nyc": "^6.4.4",
+    "tsd": "^0.6.5",
     "ts-node": "^3.0.6",
     "typescript": "^2.3.4"
   },
