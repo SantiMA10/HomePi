@@ -22,6 +22,14 @@ interface SensorConfig{
     sensorConfig : any
 }
 
+interface ThermostatServiceInstance{
+
+    user : string;
+    working: boolean;
+    status: number;
+    config : any;
+}
+
 export class ThermostatService {
 
     config : ThermostatServiceConfig;
@@ -29,7 +37,6 @@ export class ThermostatService {
     sensors : ReadData[];
     ref : admin.database.Reference;
     timeOut : any;
-    val : any;
     callback : any;
 
     constructor(config : ThermostatServiceConfig, db: admin.database.Database){
@@ -41,51 +48,49 @@ export class ThermostatService {
         });
 
         config.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
-        this.ref = db.ref("service/" +  this.config.key);
-
-        let ctx = this;
-
-        this.ref.update({
-            "name" : this.config.name,
-            "status" : this.config.status,
-            "date" : new Date(),
-            "room" : this.config.room,
-            "key" : this.config.key
-        });
-
         this.callback = (snap) => {
-            ctx.val = snap.val();
+            let instance = snap.val();
 
-            if(!ctx.val.user){
-                this.ref.update({
-                    "working" : false,
-                    "user": "homePi-server",
-                    "type" : 4,
-                    "status" : this.config.status,
-                    "date" : new Date(),
-                    "room" : this.config.room,
-                    "key" : this.config.key
-                });
+            if(this.hasToWork(instance, this.timeOut)){
+                this.ref.update(this.work(instance));
             }
-            else{
-                if(ctx.val.working && ctx.val.user !== "homePi-server" && !ctx.timeOut) {
-                    this.work(ctx.val.status, ctx.val.working);
-                }
-                else if(!ctx.val.working && ctx.val.user !== "homePi-server"){
-                    if(ctx.timeOut){
-                        clearTimeout(ctx.timeOut);
-                        ctx.timeOut = null;
-                        this.switchButton.off();
-                    }
-                }
+            else if(this.hasToStopWork(instance, this.timeOut)){
+                this.timeOut = this.stopWork();
             }
 
         };
 
-        this.ref.on("value", this.callback);
+        if(db){
+            this.ref = db.ref("service/" +  this.config.key);
+            this.ref.update({
+                "name" : this.config.name,
+                "status" : this.config.status,
+                "date" : new Date(),
+                "room" : this.config.room,
+                "key" : this.config.key
+            });
+            this.ref.on("value", this.callback);
+        }
+
+
     }
 
-    public work(status : number, working : boolean) : any {
+    public hasToWork(instance : ThermostatServiceInstance, timeOut : any) : boolean{
+        return instance.working && instance.user != process.env.SERVER_USER && !timeOut;
+    }
+
+    public hasToStopWork(instance: ThermostatServiceInstance, timeOut: any) : boolean {
+        return !instance.working && instance.user != process.env.SERVER_USER && timeOut != null;
+    }
+
+    public stopWork() : any{
+        clearTimeout(this.timeOut);
+        this.switchButton.off();
+
+        return null;
+    }
+
+    public work(instance : ThermostatServiceInstance) : any {
 
         let promises = this.sensors.map((value) => { return value.get(); });
         let current = -1;
@@ -95,27 +100,27 @@ export class ThermostatService {
         Promise.all(promises)
             .then((temperatures) => {
                 current = temperatures.reduce((temp, total) => (total + temp)/2);
-                if(working){
-                    ctx.timeOut = setTimeout(() => { ctx.work(ctx.val.status, ctx.val.working); }, ctx.config.refreshTime);
+                if(instance.working){
+                    ctx.timeOut = setTimeout(() => { ctx.work(instance); }, ctx.config.refreshTime);
                 }
-                if(current < status){
+                if(current < instance.status){
                     ctx.switchButton.on();
-                    ctx.ref.update({
+                    return{
                         "date" : new Date(),
-                    });
+                    };
                 }
                 else{
-                    if(this.val.config && this.val.config.notification) {
+                    if(instance.config && instance.config.notification) {
                         new NotificationSender().sendNotification({
                             title: this.config.name + " - " + this.config.room,
                             icon: "",
                             body: "Temperatura alcanzada. (" + current + "º)"
-                        }, this.val.config.notification);
+                        }, instance.config.config.notification);
                     }
                     ctx.switchButton.off();
-                    ctx.ref.update({
+                    return {
                         "date" : new Date(),
-                    });
+                    };
                 }
             });
 
@@ -124,6 +129,7 @@ export class ThermostatService {
     public destroy(){
         this.ref.off('value', this.callback);
     }
+
 
 
 }

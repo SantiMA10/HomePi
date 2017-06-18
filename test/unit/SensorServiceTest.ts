@@ -68,11 +68,11 @@ describe('SensorService', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 0})).to.equal(true);
         });
 
-        it('working:true, user:Server, status:false', () => {
+        it('working:true, user:SERVER_USER, status:false', () => {
             expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 0})).to.equal(false);
         });
 
-        it('working:true, user:Server, status:true', () => {
+        it('working:true, user:SERVER_USER, status:true', () => {
             expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 0})).to.equal(false);
         });
 

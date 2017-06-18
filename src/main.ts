@@ -24,7 +24,7 @@ admin.database().ref("/services").on('value', (snap) => {
     Object.keys(services).forEach((key) => {
         let service = services[key];
         service.config["key"] = key;
-        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database(), key));
+        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database()));
     });
 
 });

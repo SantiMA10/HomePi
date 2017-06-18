@@ -43,11 +43,11 @@ describe('LightService', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : true, "config" : ""})).to.equal(true);
         });
 
-        it('working:true, user:Server, status:false', () => {
+        it('working:true, user:SERVER_USER, status:false', () => {
             expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : false, "config" : ""})).to.equal(false);
         });
 
-        it('working:true, user:Server, status:true', () => {
+        it('working:true, user:SERVER_USER, status:true', () => {
             expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : true, "config" : ""})).to.equal(false);
         });
 

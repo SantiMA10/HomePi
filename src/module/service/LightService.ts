@@ -29,6 +29,12 @@ export class LightService {
     constructor(config : LightServiceConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
+        this.callback = (snap) => {
+            let instance = snap.val();
+            if(this.hasToWork(instance)){
+                this.ref.update(this.work(instance));
+            }
+        };
 
         if(db != null){
             this.ref = db.ref("service/" + this.config.key);
@@ -42,12 +48,6 @@ export class LightService {
             this.ref.on("value", this.callback);
         }
 
-        this.callback = (snap) => {
-            let instance = snap.val();
-            if(this.hasToWork(instance)){
-                this.ref.update(this.work(instance));
-            }
-        };
 
     }
 

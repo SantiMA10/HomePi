@@ -32,6 +32,12 @@ export class SensorService {
     constructor(config : SensorServiceConfig, db: admin.database.Database){
         this.config = config;
         this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
+        this.callback = (snap) => {
+            let instance = snap.val();
+            if(this.hasToWork(instance)){
+                this.ref.update(this.readSensor());
+            }
+        };
 
         if(db){
             this.ref = db.ref("service/" + this.config.key);
@@ -45,12 +51,6 @@ export class SensorService {
             this.ref.on("value", this.callback);
         }
 
-        this.callback = (snap) => {
-            let instance = snap.val();
-            if(this.hasToWork(instance)){
-                this.ref.update(this.readSensor());
-            }
-        };
 
     }
 
