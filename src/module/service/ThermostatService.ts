@@ -32,7 +32,7 @@ export class ThermostatService {
     val : any;
     callback : any;
 
-    constructor(config : ThermostatServiceConfig, db: admin.database.Database, key : string){
+    constructor(config : ThermostatServiceConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
         this.sensors = [];
@@ -41,7 +41,7 @@ export class ThermostatService {
         });
 
         config.refreshTime = config.refreshTime * 60 * 1000; //Pasamos minutos a milisegundos
-        this.ref = db.ref("service/" +  key);
+        this.ref = db.ref("service/" +  this.config.key);
 
         let ctx = this;
 

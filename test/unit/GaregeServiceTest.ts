@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
 import {GarageService, GarageStatus} from "../../src/module/service/GarageService";
+import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
 
 before((done) => {
 
@@ -9,43 +10,25 @@ before((done) => {
 
 });
 
+let config = {
+    "name" : "test",
+    "room" : "test",
+    "status" : 1,
+    "actuatorConfig" : {
+    },
+    "actuatorType" : 1,
+    "key" : "test"
+};
+
 
 describe('GarageService', () => {
     it('init', () => {
-        expect(new GarageService({
-            "name" : "Garaje",
-            "room" : "Garaje",
-            "status" : 1,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null)).to.not.equal(null);
+        expect(ServiceFactory.build(ServiceType.GARAGE, config, null)).to.be.an.instanceof(GarageService);
     });
 
     describe('hasToWork', () => {
 
-        let garageService = new GarageService({
-            "name" : "Garaje",
-            "room" : "Garaje",
-            "status" : 1,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null);
+        let garageService = ServiceFactory.build(ServiceType.GARAGE, config, null);
 
         it('working:true, user:pepe, status:OPENNING', () => {
             expect(garageService.hasToWork({"working" : true, "user" : "pepe", "status" : GarageStatus.OPENNING, "config" : ""})).to.equal(false);
@@ -99,36 +82,22 @@ describe('GarageService', () => {
 
     describe('work', () => {
 
-        let garageService = new GarageService({
-            "name" : "Garaje",
-            "room" : "Garaje",
-            "status" : 1,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null);
+        let garageService = ServiceFactory.build(ServiceType.GARAGE, config, null);
 
         it('working:true, user:pepe, status:OPEN', () => {
             garageService.work({"working" : true, "user" : "pepe", "status" : GarageStatus.OPEN, "config" : ""}).then((instance) => {
-                expect(instance).to.deep.include({"update" : { "status" : GarageStatus.CLOSSING}});
+                expect(instance.update).to.include({ "status" : GarageStatus.CLOSSING});
                 instance.promise.then((instance) => {
-                    expect(instance).to.deep.include({ "status" : GarageStatus.CLOSE});
+                    expect(instance).to.include({ "status" : GarageStatus.CLOSE});
                 });
             });
         });
 
         it('working:true, user:pepe, status:OPEN', () => {
             garageService.work({"working" : true, "user" : "pepe", "status" : GarageStatus.CLOSE, "config" : ""}).then((instance) => {
-                expect(instance).to.deep.include({"update" : { "status" : GarageStatus.OPENNING}});
+                expect(instance.update).to.include({ "status" : GarageStatus.OPENNING});
                 instance.promise.then((instance) => {
-                    expect(instance).to.deep.include({ "status" : GarageStatus.OPEN});
+                    expect(instance).to.include({ "status" : GarageStatus.OPEN});
                 });
             });
         });

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
 import {LightService} from "../../src/module/service/LightService";
+import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
 
 before((done) => {
 
@@ -9,42 +10,30 @@ before((done) => {
 
 });
 
+let config = {
+    "name" : "test",
+    "room" : "test",
+    "status" : true,
+    "actuatorConfig" : {
+        "blinkTime" : 1000,
+        "paths" : {
+            "on" : "on",
+            "off" : "off"
+        },
+        "url" : "http://10.0.0.139"
+    },
+    "actuatorType" : 1,
+    "key" : "test"
+};
+
 describe('LightService', () => {
     it('init', () => {
-        expect(new LightService({
-            "name" : "test",
-            "room" : "test",
-            "status" : true,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null)).to.not.equal(null);
+        expect(ServiceFactory.build(ServiceType.LIGHT, config, null)).to.be.an.instanceof(LightService);
     });
 
     describe('hasToWork', () => {
 
-        let service = new LightService({
-            "name" : "test",
-            "room" : "test",
-            "status" : true,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null);
+        let service = ServiceFactory.build(ServiceType.LIGHT, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : false, "config" : ""})).to.equal(true);
@@ -74,21 +63,7 @@ describe('LightService', () => {
 
     describe('work', () => {
 
-        let service = new LightService({
-            "name" : "test",
-            "room" : "test",
-            "status" : true,
-            "actuatorConfig" : {
-                "blinkTime" : 1000,
-                "paths" : {
-                    "on" : "on",
-                    "off" : "off"
-                },
-                "url" : "http://10.0.0.139"
-            },
-            "actuatorType" : 0,
-            "key" : "test"
-        }, null);
+        let service = ServiceFactory.build(ServiceType.LIGHT, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             expect(service.work({"working" : true, "user" : "pepe", "status" : false, "config" : ""})).to.deep.include({"working" : false, "user" : process.env.SERVER_USER, "status" : true});
