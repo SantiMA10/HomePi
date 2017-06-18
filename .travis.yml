@@ -16,6 +16,7 @@ branches:
     - /^v\d+\.\d+\.\d+$/
 install:
   - npm install -g codecov
+  - npm install -g istanbul
 script:
   - istanbul cover mocha \"test/**/*.ts\" --require ts-node/register --ui bdd --reporter lcovonly -- -R spec
   - codecov
