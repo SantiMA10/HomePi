@@ -9,6 +9,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/SantiMA10/HomePi.svg)](https://github.com/SantiMA10/HomePi/network)
 [![GitHub stars](https://img.shields.io/github/stars/SantiMA10/HomePi.svg)](https://github.com/SantiMA10/HomePi/stargazers)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![codecov](https://codecov.io/gh/SantiMA10/HomePi/branch/master/graph/badge.svg)](https://codecov.io/gh/SantiMA10/HomePi)
 
 ### Motivation
 HomePi is my final degree project on [University of Oviedo](https://uniovi.es), my idea is build a easy to expand home automation system.

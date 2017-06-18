@@ -17,5 +17,5 @@ branches:
 install:
   - npm install -g codecov
 script:
-  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - istanbul cover mocha \"test/**/*.ts\" --require ts-node/register --ui bdd --reporter lcovonly -- -R spec
   - codecov
