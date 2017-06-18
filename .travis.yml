@@ -18,5 +18,5 @@ install:
   - npm install -g codecov
   - npm install -g istanbul
 script:
-  - istanbul cover mocha \"test/**/*.ts\" --require ts-node/register --ui bdd --reporter lcovonly -- -R spec
+  - istanbul cover ./node_modules/mocha/bin/_mocha \"test/**/*.ts\" --require ./node_modules/ts-node/register --ui bdd --reporter lcovonly -- -R spec
   - codecov
