@@ -3,25 +3,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 var dotenv = require("dotenv");
 var LightService_1 = require("../../src/module/service/LightService");
+var SensorService_1 = require("../../src/module/service/SensorService");
 before(function (done) {
     dotenv.config();
     done();
 });
-describe('LightService', function () {
+describe('SensorService', function () {
     it('init', function () {
-        chai_1.expect(new LightService_1.LightService({
+        chai_1.expect(new SensorService_1.SensorService({
             "name": "test",
             "room": "test",
-            "status": true,
-            "actuatorConfig": {
-                "blinkTime": 1000,
-                "paths": {
-                    "on": "on",
-                    "off": "off"
+            "sensorConfig": {
+                "param": {
+                    "error": "error",
+                    "ok": "humidity"
                 },
                 "url": "http://10.0.0.139"
             },
-            "actuatorType": 0,
+            "sensorServiceType": SensorService_1.SensorServiceType.TEMPERATURE,
+            "sensorType": 0,
             "key": "test"
         }, null)).to.not.equal(null);
     });

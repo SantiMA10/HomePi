@@ -2,7 +2,7 @@ import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
 import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
 
-export interface SensorServiceType{
+export enum SensorServiceType{
     TEMPERATURE,
     HUMIDITY,
 }
@@ -16,6 +16,12 @@ export interface SensorServiceConfig{
     key : string
 }
 
+interface SensorServiceInstance{
+    working : boolean,
+    user : string,
+    status : number,
+}
+
 export class SensorService {
 
     config : SensorServiceConfig;
@@ -23,66 +29,53 @@ export class SensorService {
     ref : admin.database.Reference;
     callback : any;
 
-    constructor(config : SensorServiceConfig, db: admin.database.Database, key : string){
+    constructor(config : SensorServiceConfig, db: admin.database.Database){
         this.config = config;
         this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
-        this.ref = db.ref("service/" + key);
 
-        this.ref.update({
-            "name" : this.config.name,
-            "type" : this.config.sensorServiceType,
-            "date" : new Date(),
-            "room" : this.config.room,
-            "key" : this.config.key
-        });
+        if(db){
+            this.ref = db.ref("service/" + this.config.key);
+            this.ref.update({
+                "name" : this.config.name,
+                "type" : this.config.sensorServiceType,
+                "date" : new Date(),
+                "room" : this.config.room,
+                "key" : this.config.key
+            });
+            this.ref.on("value", this.callback);
+        }
 
         this.callback = (snap) => {
-            let val = snap.val();
-
-            if(!val.user){
-                this.ref.update({
-                    "working" : false,
-                    "user": "homePi-server",
-                    "type" : this.config.sensorServiceType,
-                    "date" : new Date(),
-                    "room" : this.config.room,
-                    "key" : this.config.key
-                });
-                this.readSensor();
-            }
-            else{
-                if(val.working && val.user !== "homePi-server") {
-                    this.readSensor();
-                }
+            let instance = snap.val();
+            if(this.hasToWork(instance)){
+                this.ref.update(this.readSensor());
             }
         };
 
-        this.ref.on("value", this.callback);
+    }
+
+    public hasToWork(instance : SensorServiceInstance){
+        return instance.working && instance.user != process.env.SERVER_USER;
     }
 
     public readSensor() : any {
         return this.sensor.get()
             .then((value) => {
-
-                this.ref.update({
+                return {
                     "working" : false,
-                    "user": "homePi-server",
+                    "user": process.env.SERVER_USER,
                     "status" : value,
                     "date" : new Date()
-                });
-
-                return value;
+                };
             })
             .catch((error) => {
 
-                this.ref.update({
+                return {
                     "working": false,
-                    "user": "homePi-server",
+                    "user": process.env.SERVER_USER,
                     "status" : "error " + error,
                     "date" : new Date()
-                });
-
-                return error;
+                };
             });
 
     }

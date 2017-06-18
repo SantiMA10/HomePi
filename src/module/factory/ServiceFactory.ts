@@ -24,7 +24,7 @@ export class ServiceFactory{
             case ServiceType.HUMIDITY:
                 return new SensorService(config, db, key);
             case ServiceType.LIGHT:
-                return new LightService(config, db, key);
+                return new LightService(config, db);
             case ServiceType.THERMOSTAT:
                 return new ThermostatService(config, db, key);
         }

@@ -78,6 +78,39 @@ describe('GarageService', function () {
             chai_1.expect(garageService.hasToWork({ "working": false, "user": "pepe", "status": GarageService_1.GarageStatus.CLOSE, "config": "" })).to.equal(false);
         });
     });
+    describe('work', function () {
+        var garageService = new GarageService_1.GarageService({
+            "name": "Garaje",
+            "room": "Garaje",
+            "status": 1,
+            "actuatorConfig": {
+                "blinkTime": 1000,
+                "paths": {
+                    "on": "on",
+                    "off": "off"
+                },
+                "url": "http://10.0.0.139"
+            },
+            "actuatorType": 0,
+            "key": "test"
+        }, null);
+        it('working:true, user:pepe, status:OPEN', function () {
+            garageService.work({ "working": true, "user": "pepe", "status": GarageService_1.GarageStatus.OPEN, "config": "" }).then(function (instance) {
+                chai_1.expect(instance).to.deep.include({ "update": { "status": GarageService_1.GarageStatus.CLOSSING } });
+                instance.promise.then(function (instance) {
+                    chai_1.expect(instance).to.deep.include({ "status": GarageService_1.GarageStatus.CLOSE });
+                });
+            });
+        });
+        it('working:true, user:pepe, status:OPEN', function () {
+            garageService.work({ "working": true, "user": "pepe", "status": GarageService_1.GarageStatus.CLOSE, "config": "" }).then(function (instance) {
+                chai_1.expect(instance).to.deep.include({ "update": { "status": GarageService_1.GarageStatus.OPENNING } });
+                instance.promise.then(function (instance) {
+                    chai_1.expect(instance).to.deep.include({ "status": GarageService_1.GarageStatus.OPEN });
+                });
+            });
+        });
+    });
 });
 after(function (done) {
     done();
