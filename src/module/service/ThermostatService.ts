@@ -5,6 +5,8 @@ import * as Promise from 'bluebird';
 import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
 import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
 import {NotificationSender} from "../util/NotificationSender";
+import Bluebird = require("bluebird");
+import {isNullOrUndefined} from "util";
 
 export interface ThermostatServiceConfig{
     name : string,
@@ -52,7 +54,7 @@ export class ThermostatService {
             let instance = snap.val();
 
             if(this.hasToWork(instance, this.timeOut)){
-                this.ref.update(this.work(instance));
+                this.work(instance).then((instance) => { this.ref.update(instance)});
             }
             else if(this.hasToStopWork(instance, this.timeOut)){
                 this.timeOut = this.stopWork();
@@ -97,7 +99,7 @@ export class ThermostatService {
 
         let ctx = this;
 
-        Promise.all(promises)
+        return Bluebird.all(promises)
             .then((temperatures) => {
                 current = temperatures.reduce((temp, total) => (total + temp)/2);
                 if(instance.working){
@@ -105,22 +107,23 @@ export class ThermostatService {
                 }
                 if(current < instance.status){
                     ctx.switchButton.on();
-                    return{
+                    return ({
                         "date" : new Date(),
-                    };
+                    });
                 }
                 else{
-                    if(instance.config && instance.config.notification) {
+
+                    if(!isNullOrUndefined(instance.config) && !isNullOrUndefined(instance.config.notification)) {
                         new NotificationSender().sendNotification({
                             title: this.config.name + " - " + this.config.room,
                             icon: "",
                             body: "Temperatura alcanzada. (" + current + "º)"
-                        }, instance.config.config.notification);
+                        }, instance.config.notification);
                     }
                     ctx.switchButton.off();
-                    return {
+                    return ({
                         "date" : new Date(),
-                    };
+                    });
                 }
             });
 

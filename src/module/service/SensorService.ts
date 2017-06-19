@@ -35,7 +35,9 @@ export class SensorService {
         this.callback = (snap) => {
             let instance = snap.val();
             if(this.hasToWork(instance)){
-                this.ref.update(this.readSensor());
+                this.readSensor().then((value) => {
+                    this.ref.update(value);
+                })
             }
         };
 
