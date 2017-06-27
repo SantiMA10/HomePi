@@ -42,35 +42,27 @@ describe('ThermostatService', () => {
         let service = AccessoryFactory.build(AccessoryType.THERMOSTAT, config, null);
 
         it('working:true, user:pepe, status:false, timeOut: null', () => {
-            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : false, "config" : ""}, null)).to.equal(true);
-        });
-
-        it('working:true, user:pepe, status:true, timeOut: null', () => {
-            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : true, "config" : ""}, null)).to.equal(true);
+            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 21, "config" : ""}, null)).to.equal(true);
         });
 
         it('working:true, user:pepe, status:false, timeOut: {}', () => {
-            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : false, "config" : ""}, {})).to.equal(false);
-        });
-
-        it('working:true, user:pepe, status:true, timeOut: {}', () => {
-            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : true, "config" : ""}, {})).to.equal(false);
+            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 21, "config" : ""}, {})).to.equal(false);
         });
 
         it('working:true, user:Server, status:false', () => {
-            expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : false, "config" : ""})).to.equal(false);
+            expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 21, "config" : ""}, null)).to.equal(false);
         });
 
         it('working:true, user:Server, status:true', () => {
-            expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : true, "config" : ""})).to.equal(false);
+            expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 21, "config" : ""}, {})).to.equal(false);
         });
 
         it('working:false, user:pepe, status:false', () => {
-            expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : false, "config" : ""})).to.equal(false);
+            expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : 21, "config" : ""}, {})).to.equal(false);
         });
 
         it('working:false, user:pepe, status:true', () => {
-            expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : true, "config" : ""})).to.equal(false);
+            expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : 21, "config" : ""}, null)).to.equal(false);
         });
 
     });
@@ -87,7 +79,6 @@ describe('ThermostatService', () => {
             expect(service.hasToStopWork({"working" : true, "user" : "pepe", "status" : 21, "config" : ""}, {})).to.equal(false);
         });
 
-        //
 
         it('working:false, user:pepe, status:21, timeOut: null', () => {
             expect(service.hasToStopWork({"working" : false, "user" : "pepe", "status" : 21, "config" : ""}, null)).to.equal(false);

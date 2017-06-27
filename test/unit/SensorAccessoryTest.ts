@@ -64,15 +64,7 @@ describe('SensorService', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 0})).to.equal(true);
         });
 
-        it('working:true, user:pepe, status:true', () => {
-            expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 0})).to.equal(true);
-        });
-
         it('working:true, user:SERVER_USER, status:false', () => {
-            expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 0})).to.equal(false);
-        });
-
-        it('working:true, user:SERVER_USER, status:true', () => {
             expect(service.hasToWork({"working" : true, "user" : process.env.SERVER_USER, "status" : 0})).to.equal(false);
         });
 
@@ -80,9 +72,7 @@ describe('SensorService', () => {
             expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : 0})).to.equal(false);
         });
 
-        it('working:false, user:pepe, status:true', () => {
-            expect(service.hasToWork({"working" : false, "user" : "pepe", "status" : 0})).to.equal(false);
-        });
+
 
     });
 
@@ -92,7 +82,7 @@ describe('SensorService', () => {
 
         it('working:true, user:pepe, status:false', () => {
             service.readSensor().catch((value) => {
-                expect(value).to.be.throw();
+                expect(value).to.equal("");
             });
         });
 

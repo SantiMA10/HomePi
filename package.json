@@ -6,7 +6,9 @@
   "scripts": {
     "test": "mocha \"test/**/*.ts\" --require ts-node/register --ui bdd",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "watch": "nodemon app/main.js"
+    "watch": "nodemon app/main.js",
+    "prestart": "gulp ts",
+    "start": "node app/main.js"
   },
   "repository": {
     "type": "git",
@@ -47,6 +49,7 @@
     "bluebird": "^3.5.0",
     "dotenv": "^4.0.0",
     "firebase-admin": "^5.0.0",
+    "gulp": "^3.9.1",
     "node-gcm": "^0.14.6",
     "request": "^2.81.0",
     "request-promise": "^4.2.0"
