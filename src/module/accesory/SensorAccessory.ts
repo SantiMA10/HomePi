@@ -1,22 +1,22 @@
 import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
-import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
+import {SensorFactory, SensorTypes} from "../../factory/SensorFactory";
 
-export enum SensorServiceType{
+export enum SensorAccessoryType{
     TEMPERATURE,
     HUMIDITY,
 }
 
-export interface SensorServiceConfig{
+export interface SensorAccessoryConfig{
     name : string,
     room : string,
     sensorType : SensorTypes,
     sensorConfig : any,
-    sensorServiceType : SensorServiceType,
+    sensorServiceType : SensorAccessoryType,
     key : string
 }
 
-interface SensorServiceInstance{
+interface SensorAccessoryInstance{
     working : boolean,
     user : string,
     status : number,
@@ -24,12 +24,12 @@ interface SensorServiceInstance{
 
 export class SensorService {
 
-    config : SensorServiceConfig;
+    config : SensorAccessoryConfig;
     sensor : ReadData;
     ref : admin.database.Reference;
     callback : any;
 
-    constructor(config : SensorServiceConfig, db: admin.database.Database){
+    constructor(config : SensorAccessoryConfig, db: admin.database.Database){
         this.config = config;
         this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
         this.callback = (snap) => {
@@ -56,7 +56,7 @@ export class SensorService {
 
     }
 
-    public hasToWork(instance : SensorServiceInstance){
+    public hasToWork(instance : SensorAccessoryInstance){
         return instance.working && instance.user != process.env.SERVER_USER;
     }
 

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {LightService} from "../../src/module/service/LightService";
-import {SensorService, SensorServiceType} from "../../src/module/service/SensorService";
-import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
+import {LightAccessory} from "../../src/module/accesory/LightAccessory";
+import {SensorService, SensorAccessoryType} from "../../src/module/accesory/SensorAccessory";
+import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
 
 before((done) => {
 
@@ -21,7 +21,7 @@ let config = {
         },
         "url" : "http://10.0.0.139"
     },
-    "sensorServiceType" : SensorServiceType.TEMPERATURE,
+    "sensorServiceType" : SensorAccessoryType.TEMPERATURE,
     "sensorType" : 1,
     "key" : "test"
 };
@@ -31,13 +31,13 @@ describe('SensorService', () => {
 
         it('temperature', () => {
 
-            expect(ServiceFactory.build(ServiceType.TEMPERATURE, config, null)).to.be.an.instanceof(SensorService);
+            expect(AccessoryFactory.build(AccessoryType.TEMPERATURE, config, null)).to.be.an.instanceof(SensorService);
 
         });
 
         it('humidity', () => {
 
-            expect(ServiceFactory.build(ServiceType.TEMPERATURE, {
+            expect(AccessoryFactory.build(AccessoryType.TEMPERATURE, {
                 "name" : "test",
                 "room" : "test",
                 "sensorConfig" : {
@@ -47,7 +47,7 @@ describe('SensorService', () => {
                     },
                     "url" : "http://10.0.0.139"
                 },
-                "sensorServiceType" : SensorServiceType.HUMIDITY,
+                "sensorServiceType" : SensorAccessoryType.HUMIDITY,
                 "sensorType" : 1,
                 "key" : "test"
             }, null)).to.be.an.instanceof(SensorService);
@@ -58,7 +58,7 @@ describe('SensorService', () => {
 
     describe('hasToWork', () => {
 
-        let service = ServiceFactory.build(ServiceType.TEMPERATURE, config, null);
+        let service = AccessoryFactory.build(AccessoryType.TEMPERATURE, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : 0})).to.equal(true);
@@ -88,7 +88,7 @@ describe('SensorService', () => {
 
     describe('work', () => {
 
-        let service = ServiceFactory.build(ServiceType.TEMPERATURE, config, null);
+        let service = AccessoryFactory.build(AccessoryType.TEMPERATURE, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             service.readSensor().catch((value) => {

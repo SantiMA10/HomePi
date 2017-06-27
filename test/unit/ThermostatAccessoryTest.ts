@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {LightService} from "../../src/module/service/LightService";
-import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
-import {ThermostatService} from "../../src/module/service/ThermostatService";
+import {LightAccessory} from "../../src/module/accesory/LightAccessory";
+import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
+import {ThermostatService} from "../../src/module/accesory/ThermostatAccessory";
 
 before((done) => {
 
@@ -34,12 +34,12 @@ let config = {
 
 describe('ThermostatService', () => {
     it('init', () => {
-        expect(ServiceFactory.build(ServiceType.THERMOSTAT, config, null)).to.be.an.instanceof(ThermostatService);
+        expect(AccessoryFactory.build(AccessoryType.THERMOSTAT, config, null)).to.be.an.instanceof(ThermostatService);
     });
 
     describe('hasToWork', () => {
 
-        let service = ServiceFactory.build(ServiceType.THERMOSTAT, config, null);
+        let service = AccessoryFactory.build(AccessoryType.THERMOSTAT, config, null);
 
         it('working:true, user:pepe, status:false, timeOut: null', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : false, "config" : ""}, null)).to.equal(true);
@@ -77,7 +77,7 @@ describe('ThermostatService', () => {
 
     describe('hasToStopWork', () => {
 
-        let service = ServiceFactory.build(ServiceType.THERMOSTAT, config, null);
+        let service = AccessoryFactory.build(AccessoryType.THERMOSTAT, config, null);
 
         it('working:true, user:pepe, status:21, timeOut: null', () => {
             expect(service.hasToStopWork({"working" : true, "user" : "pepe", "status" : 21, "config" : ""}, null)).to.equal(false);

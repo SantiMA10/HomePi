@@ -1,5 +1,5 @@
-import {RestSensor} from "../sensor/impl/RestSensor";
-import {MockSensor} from "../sensor/impl/MockSensor";
+import {RestSensor} from "../module/sensor/impl/RestSensor";
+import {MockSensor} from "../module/sensor/impl/MockSensor";
 export enum SensorTypes{
     REST_SENSOR,
     MOCK_SENSOR

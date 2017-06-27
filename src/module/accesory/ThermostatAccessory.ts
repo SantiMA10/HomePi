@@ -2,13 +2,13 @@ import { SwitchButton } from "../actuator/switch";
 import { ReadData } from "../sensor/read";
 import * as admin from "firebase-admin";
 import * as Promise from 'bluebird';
-import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
-import {SensorFactory, SensorTypes} from "../factory/SensorFactory";
-import {NotificationSender} from "../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../factory/ActuatorFactory";
+import {SensorFactory, SensorTypes} from "../../factory/SensorFactory";
+import {NotificationSender} from "../../util/NotificationSender";
 import Bluebird = require("bluebird");
 import {isNullOrUndefined} from "util";
 
-export interface ThermostatServiceConfig{
+export interface ThermostatAccessoryConfig{
     name : string,
     room : string,
     actuatorType : ActuatorType,
@@ -24,7 +24,7 @@ interface SensorConfig{
     sensorConfig : any
 }
 
-interface ThermostatServiceInstance{
+interface ThermostatAccessoryInstance{
 
     user : string;
     working: boolean;
@@ -34,14 +34,14 @@ interface ThermostatServiceInstance{
 
 export class ThermostatService {
 
-    config : ThermostatServiceConfig;
+    config : ThermostatAccessoryConfig;
     switchButton : SwitchButton;
     sensors : ReadData[];
     ref : admin.database.Reference;
     timeOut : any;
     callback : any;
 
-    constructor(config : ThermostatServiceConfig, db: admin.database.Database){
+    constructor(config : ThermostatAccessoryConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
         this.sensors = [];
@@ -77,11 +77,11 @@ export class ThermostatService {
 
     }
 
-    public hasToWork(instance : ThermostatServiceInstance, timeOut : any) : boolean{
+    public hasToWork(instance : ThermostatAccessoryInstance, timeOut : any) : boolean{
         return instance.working && instance.user != process.env.SERVER_USER && !timeOut;
     }
 
-    public hasToStopWork(instance: ThermostatServiceInstance, timeOut: any) : boolean {
+    public hasToStopWork(instance: ThermostatAccessoryInstance, timeOut: any) : boolean {
         return !instance.working && instance.user != process.env.SERVER_USER && timeOut != null;
     }
 
@@ -92,7 +92,7 @@ export class ThermostatService {
         return null;
     }
 
-    public work(instance : ThermostatServiceInstance) : any {
+    public work(instance : ThermostatAccessoryInstance) : any {
 
         let promises = this.sensors.map((value) => { return value.get(); });
         let current = -1;

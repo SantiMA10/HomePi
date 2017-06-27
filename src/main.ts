@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import {ServiceFactory} from "./module/factory/ServiceFactory";
+import {AccessoryFactory} from "./factory/AccessoryFactory";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -24,7 +24,7 @@ admin.database().ref("/services").on('value', (snap) => {
     Object.keys(services).forEach((key) => {
         let service = services[key];
         service.config["key"] = key;
-        createdServices.push(ServiceFactory.build(service.type, service.config, admin.database()));
+        createdServices.push(AccessoryFactory.build(service.type, service.config, admin.database()));
     });
 
 });

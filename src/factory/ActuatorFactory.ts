@@ -1,5 +1,5 @@
-import {RestSwitch} from "../actuator/impl/RestSwitch";
-import {MockSwitch} from "../actuator/impl/MockSwitch";
+import {RestSwitch} from "../module/actuator/impl/RestSwitch";
+import {MockSwitch} from "../module/actuator/impl/MockSwitch";
 export enum ActuatorType{
     REST_SWITCH,
     MOCK_SWITCH

@@ -1,6 +1,6 @@
 import { SwitchButton } from "../switch";
 import * as requestPromise from "request-promise";
-import {Configuration} from "../../util/RestUtil";
+import {Configuration} from "../../../util/RestUtil";
 
 interface RestSwitchConfig {
     url : string,

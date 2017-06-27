@@ -1,9 +1,9 @@
 import { SwitchButton } from "../actuator/switch";
 import * as admin from "firebase-admin";
-import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
-import {NotificationSender} from "../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../factory/ActuatorFactory";
+import {NotificationSender} from "../../util/NotificationSender";
 
-export interface LightServiceConfig{
+export interface LightAccessoryConfig{
     name : string,
     room : string,
     actuatorType : ActuatorType,
@@ -12,21 +12,21 @@ export interface LightServiceConfig{
     key : string
 }
 
-interface LightServiceInstance{
+interface LightAccessoryInstance{
     working : boolean,
     user : string,
     status : boolean,
     config : any
 }
 
-export class LightService {
+export class LightAccessory {
 
-    config : LightServiceConfig;
+    config : LightAccessoryConfig;
     switchButton : SwitchButton;
     ref : admin.database.Reference;
     callback : any;
 
-    constructor(config : LightServiceConfig, db: admin.database.Database){
+    constructor(config : LightAccessoryConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
         this.callback = (snap) => {
@@ -51,11 +51,11 @@ export class LightService {
 
     }
 
-    public hasToWork(instance : LightServiceInstance){
+    public hasToWork(instance : LightAccessoryInstance){
         return instance.working && instance.user !== process.env.SERVER_USER;
     }
 
-    public work(instance : LightServiceInstance) : any {
+    public work(instance : LightAccessoryInstance) : any {
 
         if(JSON.parse(instance.status+"")){
             this.switchButton.off();

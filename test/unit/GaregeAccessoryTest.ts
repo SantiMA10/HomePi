@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {GarageService, GarageStatus} from "../../src/module/service/GarageService";
-import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
+import {GarageAccessory, GarageStatus} from "../../src/module/accesory/GarageAccesory";
+import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
 
 before((done) => {
 
@@ -21,14 +21,14 @@ let config = {
 };
 
 
-describe('GarageService', () => {
+describe('GarageAccessory', () => {
     it('init', () => {
-        expect(ServiceFactory.build(ServiceType.GARAGE, config, null)).to.be.an.instanceof(GarageService);
+        expect(AccessoryFactory.build(AccessoryType.GARAGE, config, null)).to.be.an.instanceof(GarageAccessory);
     });
 
     describe('hasToWork', () => {
 
-        let garageService = ServiceFactory.build(ServiceType.GARAGE, config, null);
+        let garageService = AccessoryFactory.build(AccessoryType.GARAGE, config, null);
 
         it('working:true, user:pepe, status:OPENNING', () => {
             expect(garageService.hasToWork({"working" : true, "user" : "pepe", "status" : GarageStatus.OPENNING, "config" : ""})).to.equal(false);
@@ -82,7 +82,7 @@ describe('GarageService', () => {
 
     describe('work', () => {
 
-        let garageService = ServiceFactory.build(ServiceType.GARAGE, config, null);
+        let garageService = AccessoryFactory.build(AccessoryType.GARAGE, config, null);
 
         it('working:true, user:pepe, status:OPEN', () => {
             garageService.work({"working" : true, "user" : "pepe", "status" : GarageStatus.OPEN, "config" : ""}).then((instance) => {

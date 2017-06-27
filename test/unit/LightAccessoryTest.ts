@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {LightService} from "../../src/module/service/LightService";
-import {ServiceFactory, ServiceType} from "../../src/module/factory/ServiceFactory";
+import {LightAccessory} from "../../src/module/accesory/LightAccessory";
+import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
 
 before((done) => {
 
@@ -26,14 +26,14 @@ let config = {
     "key" : "test"
 };
 
-describe('LightService', () => {
+describe('LightAccessory', () => {
     it('init', () => {
-        expect(ServiceFactory.build(ServiceType.LIGHT, config, null)).to.be.an.instanceof(LightService);
+        expect(AccessoryFactory.build(AccessoryType.LIGHT, config, null)).to.be.an.instanceof(LightAccessory);
     });
 
     describe('hasToWork', () => {
 
-        let service = ServiceFactory.build(ServiceType.LIGHT, config, null);
+        let service = AccessoryFactory.build(AccessoryType.LIGHT, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             expect(service.hasToWork({"working" : true, "user" : "pepe", "status" : false, "config" : ""})).to.equal(true);
@@ -63,7 +63,7 @@ describe('LightService', () => {
 
     describe('work', () => {
 
-        let service = ServiceFactory.build(ServiceType.LIGHT, config, null);
+        let service = AccessoryFactory.build(AccessoryType.LIGHT, config, null);
 
         it('working:true, user:pepe, status:false', () => {
             expect(service.work({"working" : true, "user" : "pepe", "status" : false, "config" : ""})).to.deep.include({"working" : false, "user" : process.env.SERVER_USER, "status" : true});
