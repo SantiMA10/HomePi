@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {LightAccessory} from "../../src/module/accesory/LightAccessory";
-import {SensorService, SensorAccessoryType} from "../../src/module/accesory/SensorAccessory";
+import {LightAccessory} from "../../src/module/accesory/impl/LightAccessory";
+import {SensorService, SensorAccessoryType} from "../../src/module/accesory/impl/SensorAccessory";
 import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
 
 before((done) => {
@@ -81,7 +81,7 @@ describe('SensorService', () => {
         let service = AccessoryFactory.build(AccessoryType.TEMPERATURE, config, null);
 
         it('working:true, user:pepe, status:false', () => {
-            service.readSensor().catch((value) => {
+            service.work().catch((value) => {
                 expect(value).to.equal("");
             });
         });

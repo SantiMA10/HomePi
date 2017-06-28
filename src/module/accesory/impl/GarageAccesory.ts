@@ -1,8 +1,9 @@
-import { SwitchButton } from "../actuator/switch";
+import { SwitchButton } from "../../actuator/switch";
 import * as admin from "firebase-admin";
-import {ActuatorFactory, ActuatorType} from "../../factory/ActuatorFactory";
-import {NotificationSender} from "../../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
+import {NotificationSender} from "../../../util/NotificationSender";
 import * as Bluebird from 'bluebird';
+import {Accessory} from "../Accessory";
 
 export enum GarageStatus{
     OPEN,
@@ -27,7 +28,7 @@ interface GarageAccessoryInstance{
     config : any
 }
 
-export class GarageAccessory {
+export class GarageAccessory implements Accessory{
 
     config : GarageAccessoryConfig;
     switchButton : SwitchButton;
@@ -67,7 +68,7 @@ export class GarageAccessory {
 
     }
 
-    public hasToWork(instance : GarageAccessoryInstance){
+    public hasToWork(instance : GarageAccessoryInstance) : boolean{
         return instance.working && instance.user != process.env.SERVER_USER && instance.status != GarageStatus.CLOSSING
             && instance.status != GarageStatus.OPENNING;
     }

@@ -1,6 +1,7 @@
-import { ReadData } from "../sensor/read";
+import { ReadData } from "../../sensor/read";
 import * as admin from "firebase-admin";
-import {SensorFactory, SensorTypes} from "../../factory/SensorFactory";
+import {SensorFactory, SensorTypes} from "../../../factory/SensorFactory";
+import {Accessory} from "../Accessory";
 
 export enum SensorAccessoryType{
     TEMPERATURE,
@@ -22,7 +23,7 @@ interface SensorAccessoryInstance{
     status : number,
 }
 
-export class SensorService {
+export class SensorService implements Accessory{
 
     config : SensorAccessoryConfig;
     sensor : ReadData;
@@ -35,7 +36,7 @@ export class SensorService {
         this.callback = (snap) => {
             let instance = snap.val();
             if(this.hasToWork(instance)){
-                this.readSensor().then((value) => {
+                this.work().then((value) => {
                     this.ref.update(value);
                 })
             }
@@ -60,7 +61,7 @@ export class SensorService {
         return instance.working && instance.user != process.env.SERVER_USER;
     }
 
-    public readSensor() : any {
+    public work() : any {
         return this.sensor.get()
             .then((value) => {
                 return {

@@ -68,7 +68,7 @@ describe('SensorService', function () {
     describe('work', function () {
         var service = ServiceFactory_1.ServiceFactory.build(ServiceFactory_1.ServiceType.TEMPERATURE, config, null);
         it('working:true, user:pepe, status:false', function () {
-            service.readSensor().catch(function (value) {
+            service.work().catch(function (value) {
                 chai_1.expect(value).to.be.throw();
             });
         });

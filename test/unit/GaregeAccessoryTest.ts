@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {GarageAccessory, GarageStatus} from "../../src/module/accesory/GarageAccesory";
+import {GarageAccessory, GarageStatus} from "../../src/module/accesory/impl/GarageAccesory";
 import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
 
 before((done) => {

@@ -1,8 +1,8 @@
 
-import {GarageAccessory} from "../module/accesory/GarageAccesory";
-import {SensorService} from "../module/accesory/SensorAccessory";
-import {ThermostatService} from "../module/accesory/ThermostatAccessory";
-import {LightAccessory} from "../module/accesory/LightAccessory";
+import {GarageAccessory} from "../module/accesory/impl/GarageAccesory";
+import {SensorService} from "../module/accesory/impl/SensorAccessory";
+import {ThermostatService} from "../module/accesory/impl/ThermostatAccessory";
+import {LightAccessory} from "../module/accesory/impl/LightAccessory";
 
 export enum AccessoryType{
     GARAGE,

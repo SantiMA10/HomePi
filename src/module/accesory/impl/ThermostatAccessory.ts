@@ -1,12 +1,13 @@
-import { SwitchButton } from "../actuator/switch";
-import { ReadData } from "../sensor/read";
+import { SwitchButton } from "../../actuator/switch";
+import { ReadData } from "../../sensor/read";
 import * as admin from "firebase-admin";
 import * as Promise from 'bluebird';
-import {ActuatorFactory, ActuatorType} from "../../factory/ActuatorFactory";
-import {SensorFactory, SensorTypes} from "../../factory/SensorFactory";
-import {NotificationSender} from "../../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
+import {SensorFactory, SensorTypes} from "../../../factory/SensorFactory";
+import {NotificationSender} from "../../../util/NotificationSender";
 import Bluebird = require("bluebird");
 import {isNullOrUndefined} from "util";
+import {Accessory} from "../Accessory";
 
 export interface ThermostatAccessoryConfig{
     name : string,
@@ -32,7 +33,7 @@ interface ThermostatAccessoryInstance{
     config : any;
 }
 
-export class ThermostatService {
+export class ThermostatService implements Accessory{
 
     config : ThermostatAccessoryConfig;
     switchButton : SwitchButton;

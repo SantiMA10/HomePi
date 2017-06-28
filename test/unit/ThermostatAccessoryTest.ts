@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import * as dotenv from "dotenv";
-import {LightAccessory} from "../../src/module/accesory/LightAccessory";
+import {LightAccessory} from "../../src/module/accesory/impl/LightAccessory";
 import {AccessoryFactory, AccessoryType} from "../../src/factory/AccessoryFactory";
-import {ThermostatService} from "../../src/module/accesory/ThermostatAccessory";
+import {ThermostatService} from "../../src/module/accesory/impl/ThermostatAccessory";
 
 before((done) => {
 

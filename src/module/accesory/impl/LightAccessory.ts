@@ -1,7 +1,8 @@
-import { SwitchButton } from "../actuator/switch";
+import { SwitchButton } from "../../actuator/switch";
 import * as admin from "firebase-admin";
-import {ActuatorFactory, ActuatorType} from "../../factory/ActuatorFactory";
-import {NotificationSender} from "../../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
+import {NotificationSender} from "../../../util/NotificationSender";
+import {Accessory} from "../Accessory";
 
 export interface LightAccessoryConfig{
     name : string,
@@ -19,7 +20,7 @@ interface LightAccessoryInstance{
     config : any
 }
 
-export class LightAccessory {
+export class LightAccessory implements Accessory{
 
     config : LightAccessoryConfig;
     switchButton : SwitchButton;
