@@ -1,8 +1,9 @@
-import { SwitchButton } from "../actuator/switch";
+import { SwitchButton } from "../../actuator/switch";
 import * as admin from "firebase-admin";
-import {ActuatorFactory, ActuatorType} from "../factory/ActuatorFactory";
-import {NotificationSender} from "../util/NotificationSender";
+import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
+import {NotificationSender} from "../../../util/NotificationSender";
 import * as Bluebird from 'bluebird';
+import {Accessory} from "../Accessory";
 
 export enum GarageStatus{
     OPEN,
@@ -11,7 +12,7 @@ export enum GarageStatus{
     CLOSSING
 }
 
-export interface GarageServiceConfig {
+export interface GarageAccessoryConfig {
     name : string,
     room : string,
     actuatorType : ActuatorType,
@@ -20,21 +21,21 @@ export interface GarageServiceConfig {
     key : string
 }
 
-interface GarageServiceInstance{
+interface GarageAccessoryInstance{
     working : boolean,
     user : string,
     status : GarageStatus,
     config : any
 }
 
-export class GarageService {
+export class GarageAccessory implements Accessory{
 
-    config : GarageServiceConfig;
+    config : GarageAccessoryConfig;
     switchButton : SwitchButton;
     ref : admin.database.Reference;
     callback : any;
 
-    constructor(config : GarageServiceConfig, db: admin.database.Database){
+    constructor(config : GarageAccessoryConfig, db: admin.database.Database){
 
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
@@ -67,12 +68,12 @@ export class GarageService {
 
     }
 
-    public hasToWork(instance : GarageServiceInstance){
+    public hasToWork(instance : GarageAccessoryInstance) : boolean{
         return instance.working && instance.user != process.env.SERVER_USER && instance.status != GarageStatus.CLOSSING
             && instance.status != GarageStatus.OPENNING;
     }
 
-    public work(instance : GarageServiceInstance) : Bluebird<any> {
+    public work(instance : GarageAccessoryInstance) : Bluebird<any> {
 
         let target;
         let step;
@@ -110,7 +111,7 @@ export class GarageService {
                             "date" : new Date,
                             "status" : target,
                             "working" : false,
-                            "user": "homePi-server",
+                            "user": process.env.SERVER_USER,
                         });
 
                     }, 20000);

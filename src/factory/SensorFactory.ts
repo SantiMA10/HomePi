@@ -1,6 +1,8 @@
-import {RestSensor} from "../sensor/impl/RestSensor";
+import {RestSensor} from "../module/sensor/impl/RestSensor";
+import {MockSensor} from "../module/sensor/impl/MockSensor";
 export enum SensorTypes{
-    REST_SENSOR
+    REST_SENSOR,
+    MOCK_SENSOR
 }
 
 export class SensorFactory{
@@ -9,6 +11,8 @@ export class SensorFactory{
         switch (sensorType){
             case SensorTypes.REST_SENSOR:
                 return new RestSensor(config);
+            case SensorTypes.MOCK_SENSOR:
+                return new MockSensor(config);
         }
     }
 

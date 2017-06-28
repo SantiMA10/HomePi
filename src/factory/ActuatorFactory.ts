@@ -1,6 +1,8 @@
-import {RestSwitch} from "../actuator/impl/RestSwitch";
+import {RestSwitch} from "../module/actuator/impl/RestSwitch";
+import {MockSwitch} from "../module/actuator/impl/MockSwitch";
 export enum ActuatorType{
-    REST_SWITCH
+    REST_SWITCH,
+    MOCK_SWITCH
 }
 
 export class ActuatorFactory{
@@ -9,6 +11,8 @@ export class ActuatorFactory{
         switch (actuatorType){
             case ActuatorType.REST_SWITCH:
                 return new RestSwitch(config);
+            case ActuatorType.MOCK_SWITCH:
+                return new MockSwitch(config);
         }
     }
 
