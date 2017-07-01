@@ -4,6 +4,9 @@ import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
 import {NotificationSender} from "../../../util/NotificationSender";
 import {Accessory} from "../Accessory";
 
+/**
+ * Interfaz con los valores de la configuracion de la luz
+ */
 export interface LightAccessoryConfig{
     name : string,
     room : string,
@@ -13,6 +16,9 @@ export interface LightAccessoryConfig{
     key : string
 }
 
+/**
+ * Interfaz los datos ensenciales del estado de la luz
+ */
 interface LightAccessoryInstance{
     working : boolean,
     user : string,
@@ -20,6 +26,9 @@ interface LightAccessoryInstance{
     config : any
 }
 
+/**
+ * Clase que implementa la logica necesaria para controlar la una luz
+ */
 export class LightAccessory implements Accessory{
 
     config : LightAccessoryConfig;

@@ -9,6 +9,9 @@ import Bluebird = require("bluebird");
 import {isNullOrUndefined} from "util";
 import {Accessory} from "../Accessory";
 
+/**
+ * Interfaz con la configuracion para el accesorio
+ */
 export interface ThermostatAccessoryConfig{
     name : string,
     room : string,
@@ -20,11 +23,17 @@ export interface ThermostatAccessoryConfig{
     key : string
 }
 
+/**
+ * Interfaz con la configuracion para el sensor
+ */
 interface SensorConfig{
     sensorType : SensorTypes,
     sensorConfig : any
 }
 
+/**
+ * Interfaz con los valores necesarios para conocer el estado del accesorio
+ */
 interface ThermostatAccessoryInstance{
 
     user : string;
@@ -33,6 +42,9 @@ interface ThermostatAccessoryInstance{
     config : any;
 }
 
+/**
+ * Clase que implementa la logica para controlar un termostato
+ */
 export class ThermostatService implements Accessory{
 
     config : ThermostatAccessoryConfig;
@@ -82,6 +94,12 @@ export class ThermostatService implements Accessory{
         return instance.working && instance.user != process.env.SERVER_USER && !timeOut;
     }
 
+    /**
+     * Método que sirve para detectar si el termostato tiene que dejar de comprobar la temperatura
+     * @param instance
+     * @param timeOut
+     * @returns {boolean}
+     */
     public hasToStopWork(instance: ThermostatAccessoryInstance, timeOut: any) : boolean {
         return !instance.working && instance.user != process.env.SERVER_USER && timeOut != null;
     }

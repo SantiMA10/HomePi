@@ -5,6 +5,9 @@ import {NotificationSender} from "../../../util/NotificationSender";
 import * as Bluebird from 'bluebird';
 import {Accessory} from "../Accessory";
 
+/**
+ * Enumerado con los estados de la puerta del garaje
+ */
 export enum GarageStatus{
     OPEN,
     CLOSE,
@@ -12,6 +15,9 @@ export enum GarageStatus{
     CLOSSING
 }
 
+/**
+ * Interfaz con los valores de la configuracion del garaje
+ */
 export interface GarageAccessoryConfig {
     name : string,
     room : string,
@@ -21,6 +27,9 @@ export interface GarageAccessoryConfig {
     key : string
 }
 
+/**
+ * Interfaz los datos ensenciales del estado del garaje
+ */
 interface GarageAccessoryInstance{
     working : boolean,
     user : string,
@@ -28,6 +37,9 @@ interface GarageAccessoryInstance{
     config : any
 }
 
+/**
+ * Clase que implementa la logica necesaria para controlar la puerta del garaje
+ */
 export class GarageAccessory implements Accessory{
 
     config : GarageAccessoryConfig;

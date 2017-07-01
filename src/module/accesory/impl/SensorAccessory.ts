@@ -3,11 +3,17 @@ import * as admin from "firebase-admin";
 import {SensorFactory, SensorTypes} from "../../../factory/SensorFactory";
 import {Accessory} from "../Accessory";
 
+/**
+ * Enumerado con los diferentes tipos de sensores
+ */
 export enum SensorAccessoryType{
     TEMPERATURE,
     HUMIDITY,
 }
 
+/**
+ * Interfaz con la configuracion para el accesorio
+ */
 export interface SensorAccessoryConfig{
     name : string,
     room : string,
@@ -17,12 +23,18 @@ export interface SensorAccessoryConfig{
     key : string
 }
 
+/**
+ * Interfaz con los valores necesarios para conocer el estado del accesorio
+ */
 interface SensorAccessoryInstance{
     working : boolean,
     user : string,
     status : number,
 }
 
+/**
+ * Clase que implementa la logica para leer los datos de un sensor
+ */
 export class SensorService implements Accessory{
 
     config : SensorAccessoryConfig;
