@@ -81,7 +81,7 @@ describe('SensorService', () => {
         let service = AccessoryFactory.build(AccessoryType.TEMPERATURE, config, null);
 
         it('working:true, user:pepe, status:false', () => {
-            service.work().catch((value) => {
+            service.work({}).catch((value) => {
                 expect(value).to.equal("");
             });
         });

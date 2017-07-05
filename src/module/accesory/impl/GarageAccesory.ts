@@ -4,7 +4,13 @@ import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
 import {NotificationSender} from "../../../util/NotificationSender";
 import * as Bluebird from 'bluebird';
 import {Accessory} from "../Accessory";
+import {SensorFactory, SensorTypes} from "../../../factory/SensorFactory";
+import {ReadData} from "../../sensor/read";
+import {isNullOrUndefined} from "util";
 
+/**
+ * Enumerado con los estados de la puerta del garaje
+ */
 export enum GarageStatus{
     OPEN,
     CLOSE,
@@ -12,15 +18,23 @@ export enum GarageStatus{
     CLOSSING
 }
 
+/**
+ * Interfaz con los valores de la configuracion del garaje
+ */
 export interface GarageAccessoryConfig {
     name : string,
     room : string,
     actuatorType : ActuatorType,
     actuatorConfig : any,
+    sensorType : SensorTypes,
+    sensorConfig : any,
     status : GarageStatus,
     key : string
 }
 
+/**
+ * Interfaz los datos ensenciales del estado del garaje
+ */
 interface GarageAccessoryInstance{
     working : boolean,
     user : string,
@@ -28,10 +42,14 @@ interface GarageAccessoryInstance{
     config : any
 }
 
+/**
+ * Clase que implementa la logica necesaria para controlar la puerta del garaje
+ */
 export class GarageAccessory implements Accessory{
 
     config : GarageAccessoryConfig;
     switchButton : SwitchButton;
+    sensor : ReadData;
     ref : admin.database.Reference;
     callback : any;
 
@@ -39,6 +57,9 @@ export class GarageAccessory implements Accessory{
 
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
+        if(!isNullOrUndefined(config.sensorType) && !isNullOrUndefined(config.sensorConfig)){
+            this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
+        }
         this.callback = (snap) => {
             let instance = snap.val();
             if(this.hasToWork(instance)){
@@ -56,11 +77,11 @@ export class GarageAccessory implements Accessory{
             this.ref = db.ref("service/" + this.config.key);
 
             this.ref.update({
-                "name" : this.config.name,
+                "name" : this.config.name || "",
                 "key" : this.config.key,
-                "status" : this.config.status,
+                "status" : this.config.status || GarageStatus.CLOSE,
                 "date" : new Date(),
-                "room" : this.config.room,
+                "room" : this.config.room ,
             });
             this.ref.on("value", this.callback);
         }
@@ -99,19 +120,64 @@ export class GarageAccessory implements Accessory{
                 "promise" : new Bluebird((resolve) => {
 
                     setTimeout(() => {
-                        if(instance.config && instance.config.notification) {
-                            new NotificationSender().sendNotification({
-                                title : this.config.name + " - " + this.config.room,
-                                icon : "",
-                                body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
-                            }, instance.config.notification.filter((id) => instance.user != id));
+
+                        if(!this.sensor){
+
+                            if(instance.config && instance.config.notification) {
+                                new NotificationSender().sendNotification({
+                                    title : this.config.name + " - " + this.config.room,
+                                    icon : "",
+                                    body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
+                                }, instance.config.notification.filter((id) => instance.user != id));
+                            }
+
+                            resolve({
+                                "date" : new Date,
+                                "status" : target,
+                                "working" : false,
+                                "user": process.env.SERVER_USER,
+                            });
+
                         }
 
-                        resolve({
-                            "date" : new Date,
-                            "status" : target,
-                            "working" : false,
-                            "user": process.env.SERVER_USER,
+                        this.sensor.get().then((value) => {
+
+                            if(target == GarageStatus.CLOSE && value == 1
+                                || target == GarageStatus.OPEN && value == 0){
+
+                                if(instance.config && instance.config.notification) {
+                                    new NotificationSender().sendNotification({
+                                        title : this.config.name + " - " + this.config.room,
+                                        icon : "",
+                                        body : "Se ha detectado un error en la puerta."
+                                    }, instance.config.notification);
+                                }
+
+                                resolve({
+                                    "date" : new Date,
+                                    "working" : false,
+                                    "user": process.env.SERVER_USER,
+                                });
+
+                            }
+                            else{
+                                if(instance.config && instance.config.notification) {
+                                    new NotificationSender().sendNotification({
+                                        title : this.config.name + " - " + this.config.room,
+                                        icon : "",
+                                        body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
+                                    }, instance.config.notification.filter((id) => instance.user != id));
+                                }
+
+                                resolve({
+                                    "date" : new Date,
+                                    "status" : target,
+                                    "working" : false,
+                                    "user": process.env.SERVER_USER,
+                                });
+                            }
+
+
                         });
 
                     }, 20000);

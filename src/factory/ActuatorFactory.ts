@@ -7,6 +7,12 @@ export enum ActuatorType{
 
 export class ActuatorFactory{
 
+    /**
+     * Método para crear actuadores
+     * @param actuatorType tipo del actuador
+     * @param config configuracion del actuador
+     * @returns {any} referencia al actuador creado
+     */
     public static build(actuatorType : ActuatorType, config : any) : any{
         switch (actuatorType){
             case ActuatorType.REST_SWITCH:

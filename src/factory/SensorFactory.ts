@@ -7,6 +7,12 @@ export enum SensorTypes{
 
 export class SensorFactory{
 
+    /**
+     * Método para crear sensores
+     * @param sensorType tipo del sensor
+     * @param config configuracion del sensor
+     * @returns {any} referencia al sensor creado
+     */
     public static build(sensorType : SensorTypes, config : any) : any{
         switch (sensorType){
             case SensorTypes.REST_SENSOR:

@@ -9,6 +9,9 @@ admin.initializeApp({
     "databaseURL" : process.env.DATABASE_URL
 });
 
+/**
+ * Variable que contiene una referencia a todos los accesorios creados
+ */
 let createdServices = [];
 
 admin.database().ref("/services").on('value', (snap) => {
