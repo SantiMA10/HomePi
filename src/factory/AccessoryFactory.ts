@@ -1,7 +1,7 @@
 
 import {GarageAccessory} from "../module/accesory/impl/GarageAccesory";
 import {SensorService} from "../module/accesory/impl/SensorAccessory";
-import {ThermostatService} from "../module/accesory/impl/ThermostatAccessory";
+import {ThermostatAccessory} from "../module/accesory/impl/ThermostatAccessory";
 import {LightAccessory} from "../module/accesory/impl/LightAccessory";
 import {Accessory} from "../module/accesory/Accessory";
 
@@ -34,7 +34,7 @@ export class AccessoryFactory{
             case AccessoryType.LIGHT:
                 return new LightAccessory(config, db);
             case AccessoryType.THERMOSTAT:
-                return new ThermostatService(config, db);
+                return new ThermostatAccessory(config, db);
         }
 
     }

@@ -5,7 +5,7 @@
   "main": "app/main.js",
   "scripts": {
     "doc" : "gulp doc",
-    "test": "mocha \"test/**/*.ts\" --require ts-node/register --ui bdd",
+    "test": "mocha test/**/*.ts --require ts-node/register --ui bdd",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "watch": "nodemon app/main.js",
     "prestart": "gulp ts",
@@ -35,7 +35,6 @@
     "mocha": "^3.4.2",
     "semantic-release": "^6.3.2",
     "ts-node": "^3.0.6",
-    "tsd": "^0.6.5",
     "typedoc": "^0.7.1",
     "typescript": "^2.3.4"
   },

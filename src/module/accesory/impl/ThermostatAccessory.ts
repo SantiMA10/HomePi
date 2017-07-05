@@ -45,7 +45,7 @@ interface ThermostatAccessoryInstance{
 /**
  * Clase que implementa la logica para controlar un termostato
  */
-export class ThermostatService implements Accessory{
+export class ThermostatAccessory implements Accessory{
 
     config : ThermostatAccessoryConfig;
     switchButton : SwitchButton;
