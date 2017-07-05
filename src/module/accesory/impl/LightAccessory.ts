@@ -3,6 +3,9 @@ import * as admin from "firebase-admin";
 import {ActuatorFactory, ActuatorType} from "../../../factory/ActuatorFactory";
 import {NotificationSender} from "../../../util/NotificationSender";
 import {Accessory} from "../Accessory";
+import {ReadData} from "../../sensor/read";
+import {isNullOrUndefined} from "util";
+import {SensorFactory, SensorTypes} from "../../../factory/SensorFactory";
 
 /**
  * Interfaz con los valores de la configuracion de la luz
@@ -12,6 +15,9 @@ export interface LightAccessoryConfig{
     room : string,
     actuatorType : ActuatorType,
     actuatorConfig : any,
+    sensorType : SensorTypes,
+    sensorConfig : any,
+    photoresistorOnValue : number,
     status : boolean,
     key : string
 }
@@ -34,11 +40,18 @@ export class LightAccessory implements Accessory{
     config : LightAccessoryConfig;
     switchButton : SwitchButton;
     ref : admin.database.Reference;
+    sensor : ReadData;
     callback : any;
 
     constructor(config : LightAccessoryConfig, db: admin.database.Database){
         this.config = config;
         this.switchButton = ActuatorFactory.build(config.actuatorType, config.actuatorConfig);
+        if(!isNullOrUndefined(config.sensorType) && !isNullOrUndefined(config.sensorConfig)){
+            if(isNullOrUndefined(config.photoresistorOnValue)){
+                config.photoresistorOnValue = 80;
+            }
+            this.sensor = SensorFactory.build(config.sensorType, config.sensorConfig);
+        }
         this.callback = (snap) => {
             let instance = snap.val();
             if(this.hasToWork(instance)){
@@ -76,12 +89,34 @@ export class LightAccessory implements Accessory{
             instance.status = true;
         }
 
-        if(instance.config && instance.config.notification){
-            new NotificationSender().sendNotification({
-                title : this.config.name + " - " + this.config.room,
-                icon : "",
-                body : "Ahora la luz esta " + (instance.status ? "encendida" : "apagada") + "."
-            }, instance.config.notification.filter((id) => instance.user != id ));
+        if(!this.sensor) {
+
+            if (instance.config && instance.config.notification) {
+                new NotificationSender().sendNotification({
+                    title: this.config.name + " - " + this.config.room,
+                    icon: "",
+                    body: "Ahora la luz esta " + (instance.status ? "encendida" : "apagada") + "."
+                }, instance.config.notification.filter((id) => instance.user != id));
+            }
+
+        }
+        else{
+            this.sensor.get().then((value) => {
+
+                if(instance.status && value > this.config.photoresistorOnValue
+                    || !instance.status && value < this.config.photoresistorOnValue){
+
+                    if(instance.config && instance.config.notification) {
+                        new NotificationSender().sendNotification({
+                            title : this.config.name + " - " + this.config.room,
+                            icon : "",
+                            body : "Se ha detectado un error en la luz."
+                        }, instance.config.notification);
+                    }
+
+                }
+
+            });
         }
 
 
