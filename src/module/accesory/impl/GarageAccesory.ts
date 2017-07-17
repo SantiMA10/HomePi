@@ -139,46 +139,47 @@ export class GarageAccessory implements Accessory{
                             });
 
                         }
+                        else {
+                            this.sensor.get().then((value) => {
 
-                        this.sensor.get().then((value) => {
+                                if (target == GarageStatus.CLOSE && value == 1
+                                    || target == GarageStatus.OPEN && value == 0) {
 
-                            if(target == GarageStatus.CLOSE && value == 1
-                                || target == GarageStatus.OPEN && value == 0){
+                                    if (instance.config && instance.config.notification) {
+                                        new NotificationSender().sendNotification({
+                                            title: this.config.name + " - " + this.config.room,
+                                            icon: "",
+                                            body: "Se ha detectado un error en la puerta."
+                                        }, instance.config.notification);
+                                    }
 
-                                if(instance.config && instance.config.notification) {
-                                    new NotificationSender().sendNotification({
-                                        title : this.config.name + " - " + this.config.room,
-                                        icon : "",
-                                        body : "Se ha detectado un error en la puerta."
-                                    }, instance.config.notification);
+                                    resolve({
+                                        "date": new Date,
+                                        "working": false,
+                                        "user": process.env.SERVER_USER,
+                                    });
+
+                                }
+                                else {
+                                    if (instance.config && instance.config.notification) {
+                                        new NotificationSender().sendNotification({
+                                            title: this.config.name + " - " + this.config.room,
+                                            icon: "",
+                                            body: "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
+                                        }, instance.config.notification.filter((id) => instance.user != id));
+                                    }
+
+                                    resolve({
+                                        "date": new Date,
+                                        "status": target,
+                                        "working": false,
+                                        "user": process.env.SERVER_USER,
+                                    });
                                 }
 
-                                resolve({
-                                    "date" : new Date,
-                                    "working" : false,
-                                    "user": process.env.SERVER_USER,
-                                });
 
-                            }
-                            else{
-                                if(instance.config && instance.config.notification) {
-                                    new NotificationSender().sendNotification({
-                                        title : this.config.name + " - " + this.config.room,
-                                        icon : "",
-                                        body : "Ahora la puerta esta " + (target == GarageStatus.OPEN ? "abierta" : "cerrada") + "."
-                                    }, instance.config.notification.filter((id) => instance.user != id));
-                                }
-
-                                resolve({
-                                    "date" : new Date,
-                                    "status" : target,
-                                    "working" : false,
-                                    "user": process.env.SERVER_USER,
-                                });
-                            }
-
-
-                        });
+                            });
+                        }
 
                     }, 20000);
 

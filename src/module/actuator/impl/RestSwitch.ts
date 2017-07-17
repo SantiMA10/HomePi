@@ -39,6 +39,7 @@ export class RestSwitch implements SwitchButton{
     }
 
     on(): any {
+        console.log(this.onOptions);
         return requestPromise(this.onOptions)
             .then(() => { })
             .error(() => { });
